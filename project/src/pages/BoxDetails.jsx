@@ -107,7 +107,7 @@ const BoxDetails = () => {
             setError(null); // Clear previous errors
             try {
                 // Fetch box details from the backend using the imported 'api' (Axios instance)
-                const response = await api.get(`/boxes/${id}/`); // Adjust this endpoint to your actual backend API
+                const response = await api.get(`/boxes/public/${id}/`); // Updated to use public endpoint
                 const fetchedBox = response.data;
 
                 // Ensure rating is a number (backend might send it as string or number)
@@ -392,15 +392,20 @@ const BoxDetails = () => {
                         >
                             <h3 className="text-lg font-semibold mb-4">Amenities</h3>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                {box.amenities.map((amenity, index) => {
+                                {box.amenities && Array.isArray(box.amenities) ? box.amenities.map((amenity, index) => {
                                     const IconComponent = amenityIcons[amenity] || Shield;
                                     return (
                                         <div key={index} className="flex items-center space-x-2">
                                             <IconComponent size={18} className="text-primary-500" />
-                                            <span className="text-gray-700">{amenity}</span>
+                                            <span className="text-gray-700 dark:text-gray-300">{amenity}</span>
                                         </div>
                                     );
-                                })}
+                                }) : (
+                                    <div className="flex items-center space-x-2">
+                                        <Shield size={18} className="text-primary-500" />
+                                        <span className="text-gray-700 dark:text-gray-300">No amenities listed</span>
+                                    </div>
+                                )}
                             </div>
                         </motion.div>
 
@@ -414,12 +419,19 @@ const BoxDetails = () => {
                             >
                                 <h3 className="text-lg font-semibold mb-4">Rules & Guidelines</h3>
                                 <ul className="space-y-2">
-                                    {box.rules.map((rule, index) => (
+                                    {box.rules && Array.isArray(box.rules) ? box.rules.map((rule, index) => (
                                         <li key={index} className="flex items-start">
                                             <span className="text-primary-500 mr-2">•</span>
-                                            <span className="text-gray-700">{rule}</span>
+                                            <span className="text-gray-700 dark:text-gray-300">{rule}</span>
                                         </li>
-                                    ))}
+                                    )) : (
+                                        <li className="flex items-start">
+                                            <span className="text-primary-500 mr-2">•</span>
+                                            <span className="text-gray-700 dark:text-gray-300">
+                                                {box.rules || "No specific rules provided"}
+                                            </span>
+                                        </li>
+                                    )}
                                 </ul>
                             </motion.div>
                         )}
@@ -434,8 +446,8 @@ const BoxDetails = () => {
                             >
                                 <h3 className="text-lg font-semibold mb-4">Reviews</h3>
                                 <div className="space-y-4">
-                                    {box.reviews.map((review) => (
-                                        <div key={review.id} className="border-b border-gray-200 pb-4 last:border-b-0">
+                                    {box.reviews && Array.isArray(box.reviews) && box.reviews.length > 0 ? box.reviews.map((review) => (
+                                        <div key={review.id} className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
                                             <div className="flex items-center justify-between mb-2">
                                                 <div className="flex items-center space-x-2">
                                                     <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center text-white font-medium">
@@ -455,10 +467,14 @@ const BoxDetails = () => {
                                                     ))}
                                                 </div>
                                             </div>
-                                            <p className="text-gray-600">{review.comment}</p>
-                                            <p className="text-sm text-gray-500 mt-1">{review.date}</p>
+                                            <p className="text-gray-600 dark:text-gray-400">{review.comment}</p>
+                                            <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">{review.date}</p>
                                         </div>
-                                    ))}
+                                    )) : (
+                                        <div className="text-center py-8">
+                                            <p className="text-gray-500 dark:text-gray-400">No reviews yet. Be the first to review this box!</p>
+                                        </div>
+                                    )}
                                 </div>
                             </motion.div>
                         )}
