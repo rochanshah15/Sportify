@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useBox } from '../context/BoxContext';
 import { useDebounce } from '../hooks/useDebounce';
 import Loader from '../components/common/Loader';
+import Chatbot from '../components/common/Chatbot';
 import BoxListingsMap from '../components/maps/BoxListingsMap';
 import { animations, gradientText, shadows, useScrollAnimation, glassMorphism } from '../utils/animations';
 import { EnhancedButton, EnhancedCard, EnhancedInput, EnhancedBadge } from '../components/common/EnhancedComponents';
@@ -576,6 +577,9 @@ const BoxListings = () => {
                     )}
                 </div>
             </section>
+
+            {/* Chatbot Component */}
+            <Chatbot />
         </div>
     );
 };

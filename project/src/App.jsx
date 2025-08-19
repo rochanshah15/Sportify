@@ -17,6 +17,7 @@ import Profile from './pages/Profile';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import TestAPI from './pages/TestAPI';
+import NotFound from './pages/NotFound';
 import { useAuth } from './api.jsx'; // Correct path and extension
 
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
@@ -98,6 +99,9 @@ function App() {
                 <Navigate to="/admin-dashboard" replace />
               </ProtectedRoute>
             } />
+
+            {/* Catch-all route for 404 errors */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </AnimatePresence>
         <Footer />

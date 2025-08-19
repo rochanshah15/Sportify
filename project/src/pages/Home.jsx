@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, Star, Users, MapPin, Play, Shield, Zap, Heart, Trophy, Clock, Target } from 'lucide-react'
 import { useBox } from '../context/BoxContext'
 import Loader from '../components/common/Loader'
+import Chatbot from '../components/common/Chatbot'
 import { useAuth } from '../api.jsx'
 import useCountAnimation from '../hooks/useCountAnimation'
 import { animations, gradientText, shadows, useScrollAnimation, glassMorphism } from '../utils/animations'
@@ -780,6 +781,9 @@ const Home = () => {
           </EnhancedCard>
         </div>
       </motion.section>
+
+      {/* Chatbot Component */}
+      <Chatbot />
     </div>
   )
 }

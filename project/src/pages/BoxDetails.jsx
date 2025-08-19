@@ -9,6 +9,7 @@ import { useBox } from '../context/BoxContext';
 import { useBooking } from '../context/BookingContext';
 import Modal from '../components/common/Modal';
 import Loader from '../components/common/Loader';
+import Chatbot from '../components/common/Chatbot';
 import { EnhancedButton } from '../components/common/EnhancedComponents';
 
 // Import Swiper styles
@@ -685,6 +686,9 @@ const BoxDetails = () => {
                     </div>
                 </div>
             </Modal>
+
+            {/* Chatbot Component */}
+            <Chatbot />
         </div>
     );
 };
