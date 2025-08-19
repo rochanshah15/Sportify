@@ -298,8 +298,8 @@ const UserDashboard = () => {
   }).sort((a, b) => new Date(`${b.date}T${b.start_time}:00`) - new Date(`${a.date}T${a.start_time}:00`));
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-primary-600 to-primary-800 p-6 sm:p-8 text-white">
           <div className="flex items-center justify-between">
@@ -309,7 +309,7 @@ const UserDashboard = () => {
             </h1>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-white text-primary-700 rounded-lg shadow-md hover:bg-gray-100 transition-colors duration-200"
+              className="px-4 py-2 bg-white dark:bg-gray-200 text-primary-700 dark:text-primary-800 rounded-lg shadow-md hover:bg-gray-100 dark:hover:bg-gray-300 transition-colors duration-200"
             >
               Logout
             </button>
@@ -380,37 +380,37 @@ const UserDashboard = () => {
             <div className="space-y-8">
               {/* Stats Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-blue-50 p-6 rounded-lg shadow flex items-center justify-between">
+                <div className="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-lg shadow flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-blue-600">Total Bookings</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">
+                    <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Total Bookings</p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
                       {loading ? '...' : bookings.length}
                     </p>
                   </div>
                   <Calendar size={48} className="text-blue-400" />
                 </div>
-                <div className="bg-green-50 p-6 rounded-lg shadow flex items-center justify-between">
+                <div className="bg-green-50 dark:bg-green-900/30 p-6 rounded-lg shadow flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-green-600">This Month's Bookings</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">
+                    <p className="text-sm font-medium text-green-600 dark:text-green-400">This Month's Bookings</p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
                       {analyticsLoading ? '...' : (analyticsData?.this_month_bookings || 0)}
                     </p>
                   </div>
                   <ClockCounterClockwise size={48} className="text-green-400" />
                 </div>
-                <div className="bg-purple-50 p-6 rounded-lg shadow flex items-center justify-between">
+                <div className="bg-purple-50 dark:bg-purple-900/30 p-6 rounded-lg shadow flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-purple-600">Total Spent</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">
+                    <p className="text-sm font-medium text-purple-600 dark:text-purple-400">Total Spent</p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
                       {analyticsLoading ? '...' : `₹${(analyticsData?.total_spent || 0).toFixed(2)}`}
                     </p>
                   </div>
                   <CreditCard size={48} className="text-purple-400" />
                 </div>
-                <div className="bg-yellow-50 p-6 rounded-lg shadow flex items-center justify-between">
+                <div className="bg-yellow-50 dark:bg-yellow-900/30 p-6 rounded-lg shadow flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-yellow-600">Favorite Boxes</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">
+                    <p className="text-sm font-medium text-yellow-600 dark:text-yellow-400">Favorite Boxes</p>
+                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
                       {favoritesLoading ? '...' : (favoriteBoxes.length || 0)}
                     </p>
                   </div>
@@ -420,31 +420,31 @@ const UserDashboard = () => {
 
               {/* Recent Activity & Favorite Sports (Doughnut Chart) */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow">
-                  <h3 className="text-lg font-semibold mb-4 text-gray-800">Recent Activity</h3>
+                <div className="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Recent Activity</h3>
                   {loading ? (
-                    <div className="text-center py-4 text-gray-500">Loading recent activity...</div>
+                    <div className="text-center py-4 text-gray-500 dark:text-gray-400">Loading recent activity...</div>
                   ) : bookings.length === 0 ? (
-                    <div className="text-center py-4 text-gray-600 bg-gray-50 rounded-lg">
-                      <p>No recent activity. <button onClick={() => navigate('/boxes')} className="text-primary-600 font-medium hover:underline">Book a session!</button></p>
+                    <div className="text-center py-4 text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                      <p>No recent activity. <button onClick={() => navigate('/boxes')} className="text-primary-600 dark:text-primary-400 font-medium hover:underline">Book a session!</button></p>
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {bookings.slice(0, 4).map((booking) => (
-                        <div key={booking.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-150">
+                        <div key={booking.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
                           <div className="flex items-center space-x-3">
                             <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center text-white font-medium text-lg">
-                              {booking.box?.sport?.charAt(0).toUpperCase() ?? 'S'}
+                              {(booking.box?.sport || booking.box_sport)?.charAt(0).toUpperCase() ?? 'S'}
                             </div>
                             <div>
-                              <p className="font-medium text-gray-900">{booking.box?.name ?? 'Unknown Box'}</p>
-                              <p className="text-sm text-gray-600">
+                              <p className="font-medium text-gray-900 dark:text-gray-100">{booking.box?.name || booking.box_name || 'Unknown Box'}</p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">
                                 {new Date(booking.date).toLocaleDateString()} • {booking.start_time} - {booking.end_time}
                               </p>
                             </div>
                           </div>
                           <div className="text-right">
-                            <span className="text-primary-600 font-medium">₹{booking.total_amount}</span>
+                            <span className="text-primary-600 dark:text-primary-400 font-medium">₹{booking.total_amount}</span>
                             <p className={`text-xs font-semibold ${booking.booking_status === 'Cancelled' ? 'text-red-500' : 'text-green-500'}`}>
                               {booking.booking_status}
                             </p>
@@ -455,10 +455,10 @@ const UserDashboard = () => {
                   )}
                 </div>
 
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <h3 className="text-lg font-semibold mb-4 text-gray-800">Favorite Sports</h3>
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                  <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Favorite Sports</h3>
                   {analyticsLoading ? (
-                    <div className="h-64 flex items-center justify-center text-gray-500">Loading chart...</div>
+                    <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">Loading chart...</div>
                   ) : (
                     <div className="h-64">
                       <Doughnut data={doughnutData} options={doughnutOptions} />
@@ -496,17 +496,17 @@ const UserDashboard = () => {
                       Upcoming Bookings ({upcomingBookings.length})
                     </h3>
                     {upcomingBookings.length === 0 ? (
-                      <p className="text-gray-600">No upcoming bookings.</p>
+                      <p className="text-gray-600 dark:text-gray-400">No upcoming bookings.</p>
                     ) : (
                       <div className="space-y-4">
                         {upcomingBookings.map((booking) => (
-                          <div key={booking.id} className="p-4 border border-gray-200 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center bg-blue-50">
+                          <div key={booking.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center bg-blue-50 dark:bg-blue-900/30">
                             <div>
-                              <p className="font-semibold text-lg text-gray-900">{booking.box.name}</p>
-                              <p className="text-gray-700">
+                              <p className="font-semibold text-lg text-gray-900 dark:text-gray-100">{booking.box?.name || booking.box_name || 'Unknown Box'}</p>
+                              <p className="text-gray-700 dark:text-gray-300">
                                 {new Date(booking.date).toLocaleDateString()} at {booking.start_time} - {booking.end_time} ({booking.duration} hr)
                               </p>
-                              <p className="text-gray-700">Total: ₹{booking.total_amount}</p>
+                              <p className="text-gray-700 dark:text-gray-300">Total: ₹{booking.total_amount}</p>
                             </div>
                             <div className="mt-3 sm:mt-0">
                               {booking.booking_status === 'Confirmed' ? (
@@ -535,17 +535,17 @@ const UserDashboard = () => {
                       Past Bookings ({pastBookings.length})
                     </h3>
                     {pastBookings.length === 0 ? (
-                      <p className="text-gray-600">No past bookings.</p>
+                      <p className="text-gray-600 dark:text-gray-400">No past bookings.</p>
                     ) : (
                       <div className="space-y-4">
                         {pastBookings.map((booking) => (
-                          <div key={booking.id} className="p-4 border border-gray-200 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50">
+                          <div key={booking.id} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50 dark:bg-gray-700">
                             <div>
-                              <p className="font-semibold text-lg text-gray-900">{booking.box.name}</p>
-                              <p className="text-gray-700">
+                              <p className="font-semibold text-lg text-gray-900 dark:text-gray-100">{booking.box?.name || booking.box_name || 'Unknown Box'}</p>
+                              <p className="text-gray-700 dark:text-gray-300">
                                 {new Date(booking.date).toLocaleDateString()} at {booking.start_time} - {booking.end_time} ({booking.duration} hr)
                               </p>
-                              <p className="text-gray-700">Total: ₹{booking.total_amount}</p>
+                              <p className="text-gray-700 dark:text-gray-300">Total: ₹{booking.total_amount}</p>
                             </div>
                             <div>
                               <span className={`px-3 py-1 text-sm font-semibold rounded-full ${booking.booking_status === 'Cancelled' ? 'text-red-700 bg-red-100' : 'text-green-700 bg-green-100'}`}>

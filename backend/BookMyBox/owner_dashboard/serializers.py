@@ -9,6 +9,18 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = '__all__'
 
+class RecentBookingSerializer(serializers.Serializer):
+    """
+    Serializer for formatted recent booking data.
+    """
+    id = serializers.IntegerField()
+    user_name = serializers.CharField()
+    box_name = serializers.CharField()
+    date = serializers.DateField()
+    amount = serializers.DecimalField(max_digits=10, decimal_places=2)
+    status = serializers.CharField()
+    time_slot = serializers.CharField()
+
 class OwnerDashboardStatsSerializer(serializers.Serializer):
     """
     Defines the shape of the data for the main dashboard overview.
@@ -29,5 +41,5 @@ class OwnerDashboardStatsSerializer(serializers.Serializer):
     bookings_chart_data = serializers.ListField(child=serializers.IntegerField())
     
     # Recent Activity Lists
-    recent_bookings = BookingSerializer(many=True)
+    recent_bookings = RecentBookingSerializer(many=True)
     all_owner_boxes = BoxSerializer(many=True) # A list of all boxes owned by the user

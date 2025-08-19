@@ -369,11 +369,11 @@ const Contact = () => {
             >
               {/* Map */}
               <div className="card p-0 overflow-hidden">
-                <div className="h-64 bg-gray-200 flex items-center justify-center">
+                <div className="h-64 bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                   <div className="text-center">
                     <MapPin size={48} className="text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-600">Interactive Map</p>
-                    <p className="text-sm text-gray-500">Mumbai Office Location</p>
+                    <p className="text-gray-600 dark:text-gray-400">Interactive Map</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500">Mumbai Office Location</p>
                   </div>
                 </div>
               </div>

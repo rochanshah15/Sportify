@@ -3,9 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeProvider } from './context/ThemeContext';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
+import ScrollToTop from './components/common/ScrollToTop';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import OnboardingPage from './pages/OnboardingPage';
 import BoxListings from './pages/BoxListings';
 import BoxDetails from './pages/BoxDetails';
 import UserDashboard from './pages/UserDashboard';
@@ -41,12 +43,14 @@ function App() {
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+        <ScrollToTop />
         <Header />
         <AnimatePresence mode="wait">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/onboarding" element={<OnboardingPage />} />
             <Route path="/boxes" element={<BoxListings />} />
             <Route path="/boxes/:id" element={<BoxDetails />} />
             <Route path="/about" element={<About />} />

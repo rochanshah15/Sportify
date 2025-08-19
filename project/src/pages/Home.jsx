@@ -1,20 +1,49 @@
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Star, Users, MapPin, Clock } from 'lucide-react'
 import { useBox } from '../context/BoxContext'
 import Loader from '../components/common/Loader'
 import { useAuth } from '../api.jsx'
+import useCountAnimation from '../hooks/useCountAnimation'
 
 const Home = () => {
   const { featuredBoxes, popularBoxes, fetchFeaturedBoxes, fetchPopularBoxes } = useBox()
   const { isAuthenticated } = useAuth()
+  const [startCounting, setStartCounting] = useState(false)
+  const statsRef = useRef(null)
 
   useEffect(() => {
     // console.log('Home component mounted. Attempting to fetch data...');
     fetchFeaturedBoxes()
     fetchPopularBoxes()
   }, [])
+
+  // Intersection Observer for stats animation
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries
+        if (entry.isIntersecting && !startCounting) {
+          setStartCounting(true)
+        }
+      },
+      {
+        threshold: 0.5, // Trigger when 50% of the element is visible
+        rootMargin: '0px 0px -100px 0px' // Start animation slightly before the element is fully visible
+      }
+    )
+
+    if (statsRef.current) {
+      observer.observe(statsRef.current)
+    }
+
+    return () => {
+      if (statsRef.current) {
+        observer.unobserve(statsRef.current)
+      }
+    }
+  }, [startCounting])
 
   const sports = [
     {
@@ -61,6 +90,39 @@ const Home = () => {
     { number: '10K+', label: 'Happy Users' },
     { number: '4.8', label: 'Average Rating' }
   ]
+
+  // Animated Stat Card Component
+  const AnimatedStatCard = ({ stat, index, startAnimation }) => {
+    const animatedValue = useCountAnimation(stat.number, 2000 + index * 200, startAnimation)
+    
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
+        className="text-center"
+      >
+        <motion.div 
+          className="text-2xl font-bold text-accent-400 mb-1 font-mono tabular-nums"
+          animate={startAnimation ? { scale: [1, 1.1, 1] } : {}}
+          transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
+        >
+          {startAnimation ? animatedValue : '0'}
+        </motion.div>
+        <div className="text-sm text-primary-100">{stat.label}</div>
+      </motion.div>
+    )
+  }
+
+  // Animated number for the descriptive text
+  const AnimatedDescriptiveNumber = ({ startAnimation }) => {
+    const animatedValue = useCountAnimation('1000+', 2500, startAnimation)
+    return (
+      <span className="font-mono tabular-nums">
+        {startAnimation ? animatedValue : '1000+'}
+      </span>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
@@ -119,22 +181,22 @@ const Home = () => {
                 />
                 <div className="text-center mb-6">
                   <h3 className="text-xl font-semibold mb-2">Find Your Perfect Box</h3>
-                  <p className="text-primary-100">Over 1000+ sports boxes available across India</p>
+                  <p className="text-primary-100">
+                    Over <span className="font-semibold text-accent-400">
+                      <AnimatedDescriptiveNumber startAnimation={startCounting} />
+                    </span> sports boxes available across India
+                  </p>
                 </div>
                 
                 {/* Stats Section */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-4" ref={statsRef}>
                   {stats.map((stat, index) => (
-                    <motion.div
+                    <AnimatedStatCard 
                       key={stat.label}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
-                      className="text-center"
-                    >
-                      <div className="text-2xl font-bold text-accent-400 mb-1">{stat.number}</div>
-                      <div className="text-sm text-primary-100">{stat.label}</div>
-                    </motion.div>
+                      stat={stat}
+                      index={index}
+                      startAnimation={startCounting}
+                    />
                   ))}
                 </div>
               </div>

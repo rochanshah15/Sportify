@@ -303,9 +303,9 @@ const BoxListings = () => {
                             >
                                 <div className={`relative ${viewMode === 'list' ? 'sm:w-1/3' : ''}`}>
                                     <img src={box.image} alt={box.name} className={`w-full object-cover ${viewMode === 'list' ? 'h-48 sm:h-full' : 'h-40 sm:h-48'}`} />
-                                    <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white px-2 py-1 rounded-lg flex items-center space-x-1 shadow-sm">
+                                    <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-white dark:bg-gray-800 px-2 py-1 rounded-lg flex items-center space-x-1 shadow-sm">
                                         <Star size={14} className="text-yellow-500 fill-current" />
-                                        <span className="text-xs sm:text-sm font-medium">{box.rating ? parseFloat(box.rating).toFixed(1) : 'N/A'}</span>
+                                        <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100">{box.rating ? parseFloat(box.rating).toFixed(1) : 'N/A'}</span>
                                     </div>
                                 </div>
                                 <div className={`p-4 sm:p-6 ${viewMode === 'list' ? 'sm:w-2/3 flex flex-col justify-between' : ''}`}>

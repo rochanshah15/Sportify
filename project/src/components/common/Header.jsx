@@ -186,33 +186,33 @@ const Header = () => {
                 </button>
                 
                 {isAuthenticated ? (
-                  <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
+                  <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <Link
                       to={getDashboardRoute()}
-                      className="text-gray-600 hover:text-primary-500 font-medium"
+                      className="text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 font-medium"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Dashboard
                     </Link>
                     <Link
                       to="/profile"
-                      className="text-gray-600 hover:text-primary-500 font-medium"
+                      className="text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 font-medium"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Profile
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="text-left text-gray-600 hover:text-primary-500 font-medium"
+                      className="text-left text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 font-medium"
                     >
                       Logout
                     </button>
                   </div>
                 ) : (
-                  <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">
+                  <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <Link
                       to="/login"
-                      className="text-gray-600 hover:text-primary-500 font-medium"
+                      className="text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 font-medium"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       Login

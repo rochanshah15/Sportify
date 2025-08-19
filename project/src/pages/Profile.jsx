@@ -243,8 +243,8 @@ const Profile = () => {
                     {avatarLetter}
                   </div>
                   {isEditing && (
-                    <button className="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg border border-gray-200 hover:bg-gray-50">
-                      <Camera size={16} className="text-gray-600" />
+                    <button className="absolute bottom-0 right-0 bg-white dark:bg-gray-700 rounded-full p-2 shadow-lg border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">
+                      <Camera size={16} className="text-gray-600 dark:text-gray-400" />
                     </button>
                   )}
                 </div>

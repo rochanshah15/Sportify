@@ -341,8 +341,8 @@ const BoxDetails = () => {
                         >
                             <div className="flex items-start justify-between mb-4">
                                 <div>
-                                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{box.name}</h1>
-                                    <div className="flex items-center space-x-4 text-gray-600">
+                                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{box.name}</h1>
+                                    <div className="flex items-center space-x-4 text-gray-600 dark:text-gray-400">
                                         <div className="flex items-center">
                                             <MapPin size={18} className="mr-1" />
                                             <span>{box.location}</span>
@@ -377,7 +377,7 @@ const BoxDetails = () => {
 
                             <div className="border-t pt-4">
                                 <h3 className="text-lg font-semibold mb-3">Description</h3>
-                                <p className="text-gray-600 leading-relaxed">
+                                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                                     {box.fullDescription || box.description}
                                 </p>
                             </div>
