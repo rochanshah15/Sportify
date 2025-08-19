@@ -30,7 +30,7 @@ class OwnerDashboardAPIView(APIView):
         # Key Metrics
         stats = approved_boxes.aggregate(
             total_revenue=Coalesce(
-                Sum("bookings__total_amount", filter=Q(bookings__booking_status="completed")),
+                Sum("bookings__total_amount", filter=Q(bookings__booking_status__in=["completed", "Confirmed"])),
                 0.0,
                 output_field=DecimalField(),
             ),
@@ -58,7 +58,7 @@ class OwnerDashboardAPIView(APIView):
                     box__in=approved_boxes,
                     date__month=month_start.month,
                     date__year=month_start.year,
-                    booking_status="completed",
+                    booking_status__in=["completed", "Confirmed"],
                 ).aggregate(total=Coalesce(Sum("total_amount"), 0.0, output_field=DecimalField()))["total"]
             )
             revenue_chart_data.append(monthly_revenue)
@@ -69,7 +69,7 @@ class OwnerDashboardAPIView(APIView):
             Booking.objects.filter(
                 box__in=approved_boxes,
                 date__month=timezone.now().month - i,
-                booking_status="completed",
+                booking_status__in=["completed", "Confirmed"],
             ).count() for i in range(6)
         ]
 

@@ -5,7 +5,7 @@ const useCountAnimation = (endValue, duration = 2000, startAnimation = false) =>
   const animationRef = useRef(null);
 
   useEffect(() => {
-    if (!startAnimation) {
+    if (!startAnimation || endValue === undefined || endValue === null) {
       setCount(0);
       return;
     }
@@ -16,18 +16,24 @@ const useCountAnimation = (endValue, duration = 2000, startAnimation = false) =>
     let suffix = '';
     let hasDecimal = false;
 
-    if (endStr.includes('K+')) {
-      numericValue = parseFloat(endStr.replace('K+', '')) * 1000;
-      suffix = 'K+';
-    } else if (endStr.includes('+')) {
-      numericValue = parseFloat(endStr.replace('+', ''));
-      suffix = '+';
-    } else if (endStr.includes('.')) {
-      numericValue = parseFloat(endStr);
-      hasDecimal = true;
-    } else {
-      numericValue = parseFloat(endStr.replace(/[^\d]/g, ''));
-      suffix = endStr.replace(/[\d.]/g, '');
+    try {
+      if (endStr.includes('K+')) {
+        numericValue = parseFloat(endStr.replace('K+', '')) * 1000;
+        suffix = 'K+';
+      } else if (endStr.includes('+')) {
+        numericValue = parseFloat(endStr.replace('+', ''));
+        suffix = '+';
+      } else if (endStr.includes('.')) {
+        numericValue = parseFloat(endStr);
+        hasDecimal = true;
+      } else {
+        numericValue = parseFloat(endStr.replace(/[^\d]/g, ''));
+        suffix = endStr.replace(/[\d.]/g, '');
+      }
+    } catch (error) {
+      console.warn('Failed to parse animation value:', endValue, error);
+      numericValue = 0;
+      suffix = '';
     }
 
     let startTime = null;

@@ -215,7 +215,7 @@ const AdminDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                Welcome, {user?.name}! 🛡️
+                Welcome, {user?.first_name || user?.name?.split('@')[0] || user?.name || 'Admin'}! 🛡️
               </h1>
               <p className="text-gray-600 dark:text-gray-400">Monitor and manage the entire BookMyBox platform</p>
             </div>

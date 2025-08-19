@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth, api } from '../api.jsx'; // Import 'api' from your Auth context file
 import { useBooking } from '../context/BookingContext';
 import { toast } from 'react-toastify';
@@ -15,10 +16,25 @@ import {
   XCircle,
   Info,
   Clock as ClockCounterClockwise,
+  TrendingUp,
+  Target,
+  Activity,
+  BarChart3,
+  Sparkles,
+  Star,
+  MapPin
 } from 'lucide-react';
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, PointElement, LineElement } from 'chart.js';
 import { Doughnut, Line, Bar } from 'react-chartjs-2';
+import {
+  EnhancedSportDistribution,
+  BookingActivityChart,
+  PeakHoursChart,
+  MonthlySpendingChart,
+} from '../components/common/AdvancedCharts';
+import { animations, gradientText, shadows, glassMorphism, useScrollAnimation } from '../utils/animations';
+import { EnhancedButton, EnhancedCard, EnhancedBadge } from '../components/common/EnhancedComponents';
 
 
 // Register Chart.js components
@@ -298,80 +314,113 @@ const UserDashboard = () => {
   }).sort((a, b) => new Date(`${b.date}T${b.start_time}:00`) - new Date(`${a.date}T${a.start_time}:00`));
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-primary-600 to-primary-800 p-6 sm:p-8 text-white">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold flex items-center">
-              <Users size={36} className="mr-3" />
-              Welcome, {user.username}!
-            </h1>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 bg-white dark:bg-gray-200 text-primary-700 dark:text-primary-800 rounded-lg shadow-md hover:bg-gray-100 dark:hover:bg-gray-300 transition-colors duration-200"
-            >
-              Logout
-            </button>
-          </div>
-          <p className="mt-2 text-lg opacity-90">{user.email}</p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
+      {/* Enhanced Background Elements */}
+      <motion.div 
+        className="fixed top-0 left-0 w-96 h-96 bg-gradient-to-r from-blue-400/10 to-purple-500/10 rounded-full blur-3xl"
+        {...animations.cardFloat}
+      />
+      <motion.div 
+        className="fixed bottom-0 right-0 w-80 h-80 bg-gradient-to-r from-pink-400/10 to-blue-500/10 rounded-full blur-3xl"
+        {...animations.cardFloat}
+        transition={{ delay: 1, ...animations.cardFloat.transition }}
+      />
 
-        {/* Navigation Tabs */}
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8 px-6 sm:px-8" aria-label="Tabs">
-            <button
-              onClick={() => setActiveTab('overview')}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm sm:text-base ${
-                activeTab === 'overview'
-                  ? 'border-primary-600 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+      <div className="relative z-10 p-4 sm:p-6 lg:p-8">
+        <motion.div 
+          className="max-w-7xl mx-auto"
+          {...animations.pageTransition}
+        >
+          <EnhancedCard className="overflow-hidden backdrop-blur-xl border-0">
+            {/* Enhanced Header */}
+            <motion.div 
+              className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 p-6 sm:p-8 text-white relative overflow-hidden"
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
             >
-              Overview
-            </button>
-            <button
-              onClick={() => setActiveTab('bookings')}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm sm:text-base ${
-                activeTab === 'bookings'
-                  ? 'border-primary-600 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+              <motion.div 
+                className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-2xl"
+                {...animations.cardFloat}
+              />
+              
+              <div className="relative z-10 flex items-center justify-between">
+                <motion.div
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2, duration: 0.6 }}
+                >
+                  <h1 className="text-3xl lg:text-4xl font-bold flex items-center">
+                    <motion.div
+                      className="mr-4 p-3 bg-white/20 rounded-xl backdrop-blur-sm"
+                      whileHover={{ scale: 1.1, rotate: 360 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <Users size={36} />
+                    </motion.div>
+                    Welcome back, {user.first_name || user.username?.split('@')[0] || 'Champion'}!
+                  </h1>
+                  <p className="mt-3 text-lg opacity-90 flex items-center">
+                    <Sparkles size={18} className="mr-2" />
+                    {user.email}
+                  </p>
+                </motion.div>
+                
+                <motion.div
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4, duration: 0.6 }}
+                >
+                  <EnhancedButton
+                    onClick={handleLogout}
+                    variant="secondary"
+                    className="bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm"
+                  >
+                    Logout
+                  </EnhancedButton>
+                </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Enhanced Navigation Tabs */}
+            <motion.div 
+              className="border-b border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
             >
-              My Bookings
-            </button>
-            <button
-              onClick={() => setActiveTab('analytics')}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm sm:text-base ${
-                activeTab === 'analytics'
-                  ? 'border-primary-600 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Analytics
-            </button>
-            <button
-              onClick={() => setActiveTab('achievements')}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm sm:text-base ${
-                activeTab === 'achievements'
-                  ? 'border-primary-600 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Achievements
-            </button>
-            <button
-              onClick={() => setActiveTab('favorites')}
-              className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm sm:text-base ${
-                activeTab === 'favorites'
-                  ? 'border-primary-600 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-            >
-              Favorites
-            </button>
-          </nav>
-        </div>
+              <nav className="flex space-x-1 px-6 sm:px-8" aria-label="Tabs">
+                {[
+                  { id: 'overview', label: 'Overview', icon: <BarChart3 size={18} /> },
+                  { id: 'bookings', label: 'My Bookings', icon: <Calendar size={18} /> },
+                  { id: 'analytics', label: 'Analytics', icon: <TrendingUp size={18} /> },
+                  { id: 'achievements', label: 'Achievements', icon: <Trophy size={18} /> },
+                  { id: 'favorites', label: 'Favorites', icon: <Heart size={18} /> }
+                ].map((tab) => (
+                  <motion.button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`relative flex items-center space-x-2 py-4 px-6 font-medium text-sm sm:text-base transition-all duration-300 rounded-t-xl ${
+                      activeTab === tab.id
+                        ? 'text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800 shadow-sm'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50'
+                    }`}
+                    whileHover={{ y: -2 }}
+                    whileTap={{ y: 0 }}
+                  >
+                    <span className={activeTab === tab.id ? 'text-blue-600 dark:text-blue-400' : ''}>{tab.icon}</span>
+                    <span>{tab.label}</span>
+                    {activeTab === tab.id && (
+                      <motion.div
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600"
+                        layoutId="activeTabIndicator"
+                        transition={{ duration: 0.3 }}
+                      />
+                    )}
+                  </motion.button>
+                ))}
+              </nav>
+            </motion.div>
 
         {/* Tab Content */}
         <div className="p-6 sm:p-8">
@@ -565,68 +614,216 @@ const UserDashboard = () => {
           {/* Analytics Tab */}
           {activeTab === 'analytics' && (
             <div className="space-y-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Performance & Activity Analytics</h2>
+              <div className="flex items-center space-x-3 mb-6">
+                <BarChart3 size={28} className="text-primary-600" />
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                  Your Performance & Activity Analytics
+                </h2>
+              </div>
+              
               {analyticsLoading ? (
-                <div className="text-center py-10 text-gray-500">Loading analytics data...</div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow animate-pulse">
+                      <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded mb-2"></div>
+                      <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                    </div>
+                  ))}
+                </div>
               ) : !analyticsData ? (
-                <div className="text-center py-10 text-gray-500">No analytics data available.</div>
+                <div className="text-center py-10 text-gray-500 dark:text-gray-400">
+                  <Activity size={48} className="mx-auto mb-4 opacity-50" />
+                  <p>No analytics data available.</p>
+                </div>
               ) : (
                 <>
+                  {/* Enhanced Stats Cards */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <div className="bg-gradient-to-br from-green-500 to-green-700 p-6 rounded-lg shadow text-white">
-                      <p className="text-sm font-medium opacity-90">Total Hours Played</p>
-                      <p className="text-3xl font-bold mt-1">{(analyticsData?.total_hours_played ?? 0).toFixed(1)} <span className="text-xl">hrs</span></p>
+                    <div className="bg-gradient-to-br from-green-500 to-green-700 p-6 rounded-xl shadow-lg text-white transform hover:scale-105 transition-transform duration-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium opacity-90">Total Hours Played</p>
+                          <p className="text-3xl font-bold mt-1">
+                            {(analyticsData?.total_hours_played ?? 0).toFixed(1)}
+                            <span className="text-xl ml-1">hrs</span>
+                          </p>
+                        </div>
+                        <Clock size={32} className="opacity-80" />
+                      </div>
+                      <div className="mt-2 text-sm opacity-80">
+                        {analyticsData?.total_hours_played > 50 ? 'Sports enthusiast! 🏆' : 
+                         analyticsData?.total_hours_played > 20 ? 'Getting active! 💪' : 
+                         'Just getting started! 🌟'}
+                      </div>
                     </div>
-                    <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 p-6 rounded-lg shadow text-white">
-                      <p className="text-sm font-medium opacity-90">Average Rating</p>
-                      <p className="text-3xl font-bold mt-1">{(analyticsData?.average_rating ?? 0).toFixed(1)} / 5</p>
+
+                    <div className="bg-gradient-to-br from-indigo-500 to-indigo-700 p-6 rounded-xl shadow-lg text-white transform hover:scale-105 transition-transform duration-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium opacity-90">Average Rating</p>
+                          <p className="text-3xl font-bold mt-1">
+                            {(analyticsData?.average_rating ?? 0).toFixed(1)} / 5
+                          </p>
+                        </div>
+                        <Trophy size={32} className="opacity-80" />
+                      </div>
+                      <div className="mt-2 text-sm opacity-80">
+                        {analyticsData?.average_rating >= 4.5 ? 'Excellent experience! ⭐' : 
+                         analyticsData?.average_rating >= 4.0 ? 'Great satisfaction! 👍' : 
+                         'Room for improvement 📈'}
+                      </div>
                     </div>
-                    <div className="bg-gradient-to-br from-orange-500 to-orange-700 p-6 rounded-lg shadow text-white">
-                      <p className="text-sm font-medium opacity-90">Avg Cost / Session</p>
-                      <p className="text-3xl font-bold mt-1">₹{(analyticsData?.average_cost_per_session ?? 0).toFixed(2)}</p>
+
+                    <div className="bg-gradient-to-br from-orange-500 to-orange-700 p-6 rounded-xl shadow-lg text-white transform hover:scale-105 transition-transform duration-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium opacity-90">Avg Cost / Session</p>
+                          <p className="text-3xl font-bold mt-1">
+                            ₹{(analyticsData?.average_cost_per_session ?? 0).toFixed(0)}
+                          </p>
+                        </div>
+                        <CreditCard size={32} className="opacity-80" />
+                      </div>
+                      <div className="mt-2 text-sm opacity-80">
+                        {analyticsData?.average_cost_per_session < 500 ? 'Budget friendly! 💰' : 
+                         analyticsData?.average_cost_per_session < 1000 ? 'Good value 💵' : 
+                         'Premium choices 🌟'}
+                      </div>
                     </div>
-                    <div className="bg-gradient-to-br from-red-500 to-red-700 p-6 rounded-lg shadow text-white">
-                      <p className="text-sm font-medium opacity-90">Cancellation Rate</p>
-                      <p className="text-3xl font-bold mt-1">{(analyticsData?.cancellation_rate ?? 0).toFixed(1)}%</p>
+
+                    <div className="bg-gradient-to-br from-red-500 to-red-700 p-6 rounded-xl shadow-lg text-white transform hover:scale-105 transition-transform duration-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium opacity-90">Cancellation Rate</p>
+                          <p className="text-3xl font-bold mt-1">
+                            {(analyticsData?.cancellation_rate ?? 0).toFixed(1)}%
+                          </p>
+                        </div>
+                        <Target size={32} className="opacity-80" />
+                      </div>
+                      <div className="mt-2 text-sm opacity-80">
+                        {analyticsData?.cancellation_rate < 10 ? 'Very reliable! ✅' : 
+                         analyticsData?.cancellation_rate < 25 ? 'Pretty good 👌' : 
+                         'Try to plan better 📅'}
+                      </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-white p-6 rounded-lg shadow">
-                      <h3 className="text-lg font-semibold mb-4 text-gray-800">Monthly Spending Trend</h3>
-                      <div className="h-72">
-                        {(analyticsData?.monthly_spending && analyticsData.monthly_spending.length > 0) ? (
-                          <Line data={lineData} options={lineChartOptions} />
-                        ) : (
-                          <div className="h-full flex items-center justify-center text-gray-400">No monthly spending data.</div>
-                        )}
+                  {/* Enhanced Charts Grid */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Monthly Spending Trend */}
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                      <div className="flex items-center space-x-2 mb-4">
+                        <TrendingUp size={20} className="text-purple-600" />
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                          Monthly Spending Trend
+                        </h3>
+                      </div>
+                      <MonthlySpendingChart
+                        data={{
+                          labels: analyticsData?.monthly_spending?.map(item => item.month) || [],
+                          values: analyticsData?.monthly_spending?.map(item => item.total_spent) || [],
+                        }}
+                        loading={analyticsLoading}
+                      />
+                      <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                        Track your investment in sports activities over time
                       </div>
                     </div>
-                    <div className="bg-white p-6 rounded-lg shadow">
-                      <h3 className="text-lg font-semibold mb-4 text-gray-800">Activity by Day of Week</h3>
-                      <div className="h-72">
-                        {(analyticsData?.activity_by_day && analyticsData.activity_by_day.length > 0) ? (
-                          <Bar data={barData} options={barChartOptions} />
-                        ) : (
-                          <div className="h-full flex items-center justify-center text-gray-400">No activity data.</div>
-                        )}
+
+                    {/* Sport Distribution */}
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                      <div className="flex items-center space-x-2 mb-4">
+                        <Activity size={20} className="text-green-600" />
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                          Favorite Sports
+                        </h3>
+                      </div>
+                      <EnhancedSportDistribution
+                        data={{
+                          labels: analyticsData?.sport_distribution?.map(item => item.sport) || [],
+                          values: analyticsData?.sport_distribution?.map(item => item.percentage) || [],
+                        }}
+                        loading={analyticsLoading}
+                      />
+                      <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                        Your sports preferences based on booking history
+                      </div>
+                    </div>
+
+                    {/* Activity by Day */}
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                      <div className="flex items-center space-x-2 mb-4">
+                        <Calendar size={20} className="text-blue-600" />
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                          Weekly Activity Pattern
+                        </h3>
+                      </div>
+                      <BookingActivityChart
+                        data={{
+                          labels: analyticsData?.activity_by_day?.map(item => item.day_of_week) || [],
+                          values: analyticsData?.activity_by_day?.map(item => item.total_hours) || [],
+                        }}
+                        loading={analyticsLoading}
+                      />
+                      <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                        When you're most active during the week
+                      </div>
+                    </div>
+
+                    {/* Peak Booking Hours */}
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                      <div className="flex items-center space-x-2 mb-4">
+                        <Clock size={20} className="text-orange-600" />
+                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+                          Peak Booking Hours
+                        </h3>
+                      </div>
+                      <PeakHoursChart
+                        data={{
+                          labels: analyticsData?.peak_booking_hours?.map(item => item.hour_range) || [],
+                          values: analyticsData?.peak_booking_hours?.map(item => item.percentage) || [],
+                        }}
+                        loading={analyticsLoading}
+                      />
+                      <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                        Your preferred time slots for sports activities
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-white p-6 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold mb-4 text-gray-800">Your Peak Booking Hours</h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                      {(analyticsData?.peak_booking_hours && analyticsData.peak_booking_hours.length > 0) ? (
-                        analyticsData.peak_booking_hours.map((hour, index) => (
-                          <div key={index} className="p-4 bg-purple-50 rounded-lg flex items-center justify-between">
-                            <span className="font-medium text-purple-800">{hour.hour_range}</span>
-                            <span className="text-purple-700 text-lg font-bold">{hour.percentage?.toFixed(1) ?? 0}%</span>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="text-gray-600">No peak booking hours data available.</p>
-                      )}
+                  {/* Insights Section */}
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 rounded-xl border border-blue-200 dark:border-blue-800">
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                      <Info size={20} className="mr-2 text-blue-600" />
+                      Your Sports Insights
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                        <p className="font-medium text-gray-800 dark:text-white">Most Active Sport</p>
+                        <p className="text-blue-600 dark:text-blue-400">
+                          {analyticsData?.sport_distribution?.[0]?.sport || 'N/A'}
+                        </p>
+                      </div>
+                      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                        <p className="font-medium text-gray-800 dark:text-white">Total Investment</p>
+                        <p className="text-green-600 dark:text-green-400">
+                          ₹{(analyticsData?.total_spent || 0).toLocaleString()}
+                        </p>
+                      </div>
+                      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                        <p className="font-medium text-gray-800 dark:text-white">This Month</p>
+                        <p className="text-purple-600 dark:text-purple-400">
+                          {analyticsData?.this_month_bookings || 0} bookings
+                        </p>
+                      </div>
+                      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+                        <p className="font-medium text-gray-800 dark:text-white">Consistency Score</p>
+                        <p className="text-orange-600 dark:text-orange-400">
+                          {analyticsData?.cancellation_rate < 10 ? 'Excellent' : 
+                           analyticsData?.cancellation_rate < 25 ? 'Good' : 'Needs Improvement'}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </>
@@ -712,7 +909,9 @@ const UserDashboard = () => {
             </div>
           )}
         </div>
-      </div>
+      </EnhancedCard>
+    </motion.div>
+  </div>
 
       {/* Cancel Confirmation Modal */}
       <Transition appear show={isCancelModalOpen} as={Fragment}>

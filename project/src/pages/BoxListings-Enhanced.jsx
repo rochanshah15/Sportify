@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { useBox } from '../context/BoxContext';
 import { useDebounce } from '../hooks/useDebounce';
 import Loader from '../components/common/Loader';
-import BoxListingsMap from '../components/maps/BoxListingsMap';
+import NearbyBoxesMap from '../components/maps/NearbyBoxesMap';
 import { animations, gradientText, shadows, useScrollAnimation, glassMorphism } from '../utils/animations';
 import { EnhancedButton, EnhancedCard, EnhancedInput, EnhancedBadge } from '../components/common/EnhancedComponents';
 
@@ -113,16 +113,16 @@ const BoxListings = () => {
                         initial={{ scale: 0.8 }}
                         whileHover={{ scale: 1 }}
                     >
-                        <Link to={`/boxes/${box.id}`}>
-                            <EnhancedButton
-                                variant="secondary"
-                                size="sm"
-                                icon={<ArrowRight size={16} />}
-                                className="bg-white/90 text-gray-900 backdrop-blur-sm"
-                            >
-                                View Details
-                            </EnhancedButton>
-                        </Link>
+                        <EnhancedButton
+                            as={Link}
+                            to={`/boxes/${box.id}`}
+                            variant="secondary"
+                            size="sm"
+                            icon={<ArrowRight size={16} />}
+                            className="bg-white/90 text-gray-900 backdrop-blur-sm"
+                        >
+                            View Details
+                        </EnhancedButton>
                     </motion.div>
                 </div>
                 
@@ -151,113 +151,15 @@ const BoxListings = () => {
                         </div>
                     </div>
 
-                    <Link to={`/boxes/${box.id}`}>
-                        <EnhancedButton
-                            className="w-full"
-                            size="md"
-                            icon={<Target size={16} />}
-                        >
-                            Book Now
-                        </EnhancedButton>
-                    </Link>
-                </div>
-            </EnhancedCard>
-        </motion.div>
-    );
-
-    const BoxListCard = ({ box, index }) => (
-        <motion.div
-            variants={animations.staggerItem}
-            className="group"
-        >
-            <EnhancedCard hover className="overflow-hidden p-0 h-full">
-                <div className="flex flex-col sm:flex-row">
-                    {/* Image Section */}
-                    <div className="relative sm:w-80 sm:flex-shrink-0 overflow-hidden">
-                        <img
-                            src={box.image}
-                            alt={box.name}
-                            className="w-full h-48 sm:h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        
-                        <motion.div 
-                            className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-2 rounded-xl flex items-center space-x-1"
-                            whileHover={{ scale: 1.05 }}
-                        >
-                            <Star size={16} className="text-yellow-500 fill-current" />
-                            <span className="text-sm font-bold text-gray-900">{box.rating}</span>
-                        </motion.div>
-
-                        <div className="absolute top-4 left-4">
-                            <EnhancedBadge variant="primary" size="sm">
-                                {box.sport || 'Multi-sport'}
-                            </EnhancedBadge>
-                        </div>
-                    </div>
-                    
-                    {/* Content Section */}
-                    <div className="flex-1 p-6 flex flex-col justify-between">
-                        <div>
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="flex-1 mr-4">
-                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
-                                        {box.name}
-                                    </h3>
-                                    <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
-                                        Experience premium sports facilities with state-of-the-art equipment and professional maintenance.
-                                    </p>
-                                </div>
-                                <div className="text-right">
-                                    <span className={`text-2xl font-bold ${gradientText}`}>
-                                        ₹{box.price}
-                                    </span>
-                                    <div className="text-sm text-gray-500 dark:text-gray-400">per hour</div>
-                                </div>
-                            </div>
-                            
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-                                <div className="flex items-center text-gray-600 dark:text-gray-400">
-                                    <MapPin size={18} className="mr-3 text-blue-500" />
-                                    <span className="text-sm font-medium">{box.location}</span>
-                                </div>
-                                <div className="flex items-center text-gray-600 dark:text-gray-400">
-                                    <Users size={18} className="mr-3 text-green-500" />
-                                    <span className="text-sm font-medium">Up to {box.capacity} players</span>
-                                </div>
-                                <div className="flex items-center text-gray-600 dark:text-gray-400">
-                                    <Clock size={18} className="mr-3 text-purple-500" />
-                                    <span className="text-sm font-medium">Available today</span>
-                                </div>
-                                <div className="flex items-center text-gray-600 dark:text-gray-400">
-                                    <Target size={18} className="mr-3 text-orange-500" />
-                                    <span className="text-sm font-medium">{box.sport || 'Multi-sport'}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-3">
-                            <Link to={`/boxes/${box.id}`} className="flex-1">
-                                <EnhancedButton
-                                    variant="secondary"
-                                    className="w-full"
-                                    size="md"
-                                    icon={<ArrowRight size={16} />}
-                                >
-                                    View Details
-                                </EnhancedButton>
-                            </Link>
-                            <Link to={`/boxes/${box.id}`} className="flex-1">
-                                <EnhancedButton
-                                    className="w-full"
-                                    size="md"
-                                    icon={<Target size={16} />}
-                                >
-                                    Book Now
-                                </EnhancedButton>
-                            </Link>
-                        </div>
-                    </div>
+                    <EnhancedButton
+                        as={Link}
+                        to={`/boxes/${box.id}`}
+                        className="w-full"
+                        size="md"
+                        icon={<Target size={16} />}
+                    >
+                        Book Now
+                    </EnhancedButton>
                 </div>
             </EnhancedCard>
         </motion.div>
@@ -267,7 +169,7 @@ const BoxListings = () => {
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
             {/* Enhanced Header */}
             <motion.section 
-                className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
+                className="py-16 px-4 sm:px-6 lg:px-8 relative overflow-hidden"
                 {...animations.pageTransition}
             >
                 {/* Background Elements */}
@@ -327,7 +229,7 @@ const BoxListings = () => {
                                         icon={<Map size={18} />}
                                         className="flex-1 lg:flex-none"
                                     >
-                                        {showMap ? 'Close Map' : 'View Map'}
+                                        Map
                                     </EnhancedButton>
 
                                     <div className="flex bg-gray-100 dark:bg-gray-700 rounded-xl p-1">
@@ -459,12 +361,21 @@ const BoxListings = () => {
                 </motion.section>
             )}
 
-            {/* Enhanced Map View - Modal Style like Nearby Boxes */}
-            <BoxListingsMap 
-                isOpen={showMap} 
-                onClose={() => setShowMap(false)} 
-                boxes={sortedBoxes} 
-            />
+            {/* Enhanced Map View */}
+            {showMap && (
+                <motion.section 
+                    className="px-4 sm:px-6 lg:px-8 pb-8"
+                    {...animations.slideInUp}
+                >
+                    <div className="max-w-7xl mx-auto">
+                        <EnhancedCard className="p-0 overflow-hidden">
+                            <div className="h-96">
+                                <NearbyBoxesMap boxes={sortedBoxes} />
+                            </div>
+                        </EnhancedCard>
+                    </div>
+                </motion.section>
+            )}
 
             {/* Enhanced Results Section */}
             <section className="px-4 sm:px-6 lg:px-8 pb-20">
@@ -563,13 +474,9 @@ const BoxListings = () => {
                                     initial="initial"
                                     animate="animate"
                                 >
-                                    {sortedBoxes.map((box, index) => 
-                                        viewMode === 'grid' ? (
-                                            <BoxCard key={box.id} box={box} index={index} />
-                                        ) : (
-                                            <BoxListCard key={box.id} box={box} index={index} />
-                                        )
-                                    )}
+                                    {sortedBoxes.map((box, index) => (
+                                        <BoxCard key={box.id} box={box} index={index} />
+                                    ))}
                                 </motion.div>
                             )}
                         </>

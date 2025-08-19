@@ -3,12 +3,13 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
-import { Star, MapPin, Users, Wifi, Car, Coffee, Shield, Calendar as CalendarIcon, ArrowLeft } from 'lucide-react';
+import { Star, MapPin, Users, Wifi, Car, Coffee, Shield, Calendar as CalendarIcon, ArrowLeft, Heart } from 'lucide-react';
 import Calendar from 'react-calendar';
 import { useBox } from '../context/BoxContext';
 import { useBooking } from '../context/BookingContext';
 import Modal from '../components/common/Modal';
 import Loader from '../components/common/Loader';
+import { EnhancedButton } from '../components/common/EnhancedComponents';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -266,8 +267,10 @@ const BoxDetails = () => {
                 <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
                     <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
                     <p className="text-gray-700 dark:text-gray-300 mb-6">{error}</p>
-                    <Link to="/boxes" className="btn-primary">
-                        Browse Other Boxes
+                    <Link to="/boxes">
+                        <EnhancedButton variant="primary" size="md">
+                            Browse Other Boxes
+                        </EnhancedButton>
                     </Link>
                 </div>
             </div>
@@ -280,8 +283,10 @@ const BoxDetails = () => {
                 <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Box not found</h2>
                     <p className="text-gray-700 dark:text-gray-300 mb-6">The box you are looking for does not exist or has been removed.</p>
-                    <Link to="/boxes" className="btn-primary">
-                        Browse Other Boxes
+                    <Link to="/boxes">
+                        <EnhancedButton variant="primary" size="md">
+                            Browse Other Boxes
+                        </EnhancedButton>
                     </Link>
                 </div>
             </div>
@@ -290,18 +295,26 @@ const BoxDetails = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-            {/* Back Button */}
-            <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 transition-colors duration-200">
+            {/* Header Section with Back Button */}
+            <motion.div 
+                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border-b dark:border-gray-700 transition-colors duration-200"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+            >
                 <div className="container-max section-padding py-4">
-                    <Link
-                        to="/boxes"
-                        className="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
-                    >
-                        <ArrowLeft size={20} className="mr-2" />
-                        Back to Boxes
-                    </Link>
+                    <div className="flex items-center justify-between">
+                        <Link
+                            to="/boxes"
+                            className="inline-flex items-center px-3 py-2 bg-white/90 dark:bg-gray-700/90 backdrop-blur-sm rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 hover:scale-105 transition-all duration-300"
+                        >
+                            <ArrowLeft size={18} className="mr-2" />
+                            <span className="text-sm font-medium">Back</span>
+                        </Link>
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Box Details</h2>
+                        <div className="w-20"></div> {/* Spacer for centering */}
+                    </div>
                 </div>
-            </div>
+            </motion.div>
 
             <div className="container-max section-padding py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -360,17 +373,20 @@ const BoxDetails = () => {
                                             {typeof box.rating === 'number' ? box.rating.toFixed(1) : 'N/A'}
                                         </span>
                                     </div>
-                                    <div className="text-2xl font-bold text-primary-600">₹{box.price}/hr</div>
+                                    <div className="text-2xl font-bold text-primary-600 mb-4">₹{box.price}/hr</div>
                                     {/* Add to Favorites Button */}
                                     {user && (
-                                        <button
+                                        <EnhancedButton
                                             onClick={handleAddToFavorites}
-                                            className={`mt-3 px-4 py-2 rounded-lg shadow w-full transition-colors
-                                                ${isFavorite ? 'bg-green-500 text-white cursor-not-allowed' : 'bg-pink-500 text-white hover:bg-pink-600'}`}
-                                            disabled={isFavorite || favoriteLoading}
+                                            variant={isFavorite ? "secondary" : "primary"}
+                                            size="sm"
+                                            className={`w-full ${isFavorite ? 'bg-green-100 text-green-700 border-green-300' : ''}`}
+                                            icon={<Heart size={16} className={isFavorite ? 'fill-current' : ''} />}
+                                            loading={favoriteLoading}
+                                            disabled={isFavorite}
                                         >
-                                            {isFavorite ? 'Added' : (favoriteLoading ? 'Adding...' : 'Add to Favorites')}
-                                        </button>
+                                            {isFavorite ? 'Added to Favorites' : 'Add to Favorites'}
+                                        </EnhancedButton>
                                     )}
                                 </div>
                             </div>
@@ -601,12 +617,16 @@ const BoxDetails = () => {
                             </div>
 
                             {/* Book Button */}
-                            <button
-                                onClick={() => setShowBookingModal(true)} // Still opens confirmation modal first
-                                className="w-full btn-primary"
+                            <EnhancedButton
+                                onClick={() => setShowBookingModal(true)}
+                                variant="primary"
+                                size="lg"
+                                className="w-full"
+                                disabled={!selectedTimeSlot || bookingLoading}
+                                loading={bookingLoading}
                             >
-                                Book Now
-                            </button>
+                                {bookingLoading ? 'Processing...' : 'Book Now'}
+                            </EnhancedButton>
 
                             <p className="text-xs text-gray-500 mt-2 text-center">
                                 Free cancellation up to 2 hours before booking time
@@ -644,19 +664,24 @@ const BoxDetails = () => {
                     </div>
 
                     <div className="flex space-x-3">
-                        <button
+                        <EnhancedButton
                             onClick={() => setShowBookingModal(false)}
-                            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                            variant="secondary"
+                            size="md"
+                            className="flex-1"
                         >
                             Cancel
-                        </button>
-                        <button
-                            onClick={confirmBooking} // This now directly calls confirmBooking
+                        </EnhancedButton>
+                        <EnhancedButton
+                            onClick={confirmBooking}
+                            variant="primary"
+                            size="md"
+                            className="flex-1"
+                            loading={bookingLoading}
                             disabled={bookingLoading}
-                            className="flex-1 btn-primary disabled:opacity-50"
                         >
-                            {bookingLoading ? 'Confirming...' : 'Confirm Booking'}
-                        </button>
+                            Confirm Booking
+                        </EnhancedButton>
                     </div>
                 </div>
             </Modal>
