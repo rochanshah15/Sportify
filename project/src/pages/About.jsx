@@ -41,19 +41,19 @@ const About = () => {
 
   const team = [
     {
-      name: 'Rajesh Kumar',
+      name: 'Rochan shah',
       role: 'Founder & CEO',
       image: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg',
-      bio: 'Former national cricket player with 15+ years in sports management.'
-    },
-    {
-      name: 'Priya Sharma',
-      role: 'CTO',
-      image: 'https://images.pexels.com/photos/3756679/pexels-photo-3756679.jpeg',
       bio: 'Tech enthusiast with expertise in building scalable platforms.'
     },
     {
-      name: 'Amit Patel',
+      name: 'khush shah',
+      role: 'CTO',
+      image: 'https://images.pexels.com/photos/3756679/pexels-photo-3756679.jpeg',
+      bio: 'passionate about sports and technology.'
+    },
+    {
+      name: 'pushya shah',
       role: 'Head of Operations',
       image: 'https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg',
       bio: 'Sports facility management expert with 10+ years experience.'
@@ -338,7 +338,7 @@ const About = () => {
                   BookMyBox was born from a simple frustration: finding and booking quality sports facilities was unnecessarily complicated. Our founders, all avid sports players, experienced firsthand the challenges of coordinating games with friends.
                 </p>
                 <p className="text-lg">
-                  In 2023, we set out to solve this problem by creating a platform that would make sports booking as easy as ordering food online. We started with a handful of cricket boxes in Mumbai and have since expanded to over 500 facilities across 50+ cities.
+                  In 2025, we set out to solve this problem by creating a platform that would make sports booking as easy as ordering food online. We started with a handful of cricket boxes in Mumbai and have since expanded to over 500 facilities across 50+ cities.
                 </p>
                 <p className="text-lg">
                   Today, BookMyBox is India's leading sports facility booking platform, trusted by thousands of players and facility owners. But we're just getting started – our vision is to make sports accessible to every Indian, in every city, at every skill level.

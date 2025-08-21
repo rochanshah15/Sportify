@@ -9,6 +9,7 @@ import {
 } from 'chart.js';
 
 import AddBoxForm from '../components/boxes/AddBoxForm';
+import ViewBoxModal from '../components/boxes/ViewBoxModal';
 import { useAuth, api } from '../api.jsx';
 import { useBox } from '../context/BoxContext';
 import { 
@@ -46,6 +47,9 @@ const Placeholder = ({ text, icon: Icon = AlertCircle }) => (
 const OwnerDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [showAddBoxModal, setShowAddBoxModal] = useState(false);
+  const [showEditBoxModal, setShowEditBoxModal] = useState(false);
+  const [showViewBoxModal, setShowViewBoxModal] = useState(false);
+  const [selectedBox, setSelectedBox] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
   const [error, setError] = useState(null);
@@ -78,6 +82,24 @@ const OwnerDashboard = () => {
     setShowAddBoxModal(false);
     fetchAllData();
     refreshAll();
+  };
+
+  // Success handler for the EditBoxForm
+  const handleEditBoxSuccess = () => {
+    setShowEditBoxModal(false);
+    setSelectedBox(null);
+    fetchAllData();
+    refreshAll();
+  };
+
+  const handleViewBox = (box) => {
+    setSelectedBox(box);
+    setShowViewBoxModal(true);
+  };
+
+  const handleEditBox = (box) => {
+    setSelectedBox(box);
+    setShowEditBoxModal(true);
   };
 
   // Data derivation from API
@@ -234,45 +256,46 @@ const OwnerDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900 pt-20 overflow-x-hidden">
       {/* Enhanced Background Elements */}
       <motion.div 
-        className="fixed top-0 left-0 w-96 h-96 bg-gradient-to-r from-blue-400/10 to-purple-500/10 rounded-full blur-3xl"
+        className="fixed top-0 left-0 w-72 sm:w-96 h-72 sm:h-96 bg-gradient-to-r from-blue-400/10 to-purple-500/10 rounded-full blur-3xl"
         {...animations.cardFloat}
       />
       <motion.div 
-        className="fixed bottom-0 right-0 w-80 h-80 bg-gradient-to-r from-pink-400/10 to-blue-500/10 rounded-full blur-3xl"
+        className="fixed bottom-0 right-0 w-64 sm:w-80 h-64 sm:h-80 bg-gradient-to-r from-pink-400/10 to-blue-500/10 rounded-full blur-3xl"
         {...animations.cardFloat}
         transition={{ delay: 1, ...animations.cardFloat.transition }}
       />
 
-      <div className="relative z-10 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           {/* Enhanced Header */}
           <motion.div 
-            className="mb-12"
+            className="mb-8 sm:mb-12"
             {...animations.pageTransition}
           >
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2, duration: 0.6 }}
+                className="flex-1"
               >
-                <div className="flex items-center space-x-4 mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-4">
                   <motion.div
-                    className="p-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl"
+                    className="p-3 sm:p-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl self-start"
                     whileHover={{ scale: 1.1, rotate: 360 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <Building size={32} className="text-white" />
+                    <Building size={24} className="text-white sm:w-8 sm:h-8" />
                   </motion.div>
                   <div>
-                    <h1 className={`text-4xl lg:text-5xl font-bold mb-2 ${gradientText}`}>
+                    <h1 className={`text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 ${gradientText}`}>
                       Welcome back, {user?.first_name || user?.email?.split('@')[0] || 'Owner'}!
                     </h1>
-                    <p className="text-xl text-gray-600 dark:text-gray-300 flex items-center">
-                      <Sparkles size={20} className="mr-2 text-blue-500" />
+                    <p className="text-base sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300 flex items-center">
+                      <Sparkles size={16} className="mr-2 text-blue-500 sm:w-5 sm:h-5" />
                       Manage your sports facilities and track performance
                     </p>
                   </div>
@@ -283,12 +306,12 @@ const OwnerDashboard = () => {
                 initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4, duration: 0.6 }}
-                className="flex space-x-4"
+                className="flex flex-col sm:flex-row gap-4 sm:space-x-4"
               >
                 <EnhancedButton
                   onClick={() => setShowAddBoxModal(true)}
-                  icon={<Plus size={20} />}
-                  className="group"
+                  icon={<Plus size={18} />}
+                  className="group w-full sm:w-auto"
                 >
                   <span className="group-hover:translate-x-1 transition-transform">Add New Box</span>
                 </EnhancedButton>
@@ -318,8 +341,8 @@ const OwnerDashboard = () => {
           </motion.div>
 
           {/* Enhanced Stats Cards */}
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12"
+          <motion.div
+            className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mb-8 sm:mb-12"
             variants={animations.staggerContainer}
             initial="initial"
             whileInView="animate"
@@ -338,7 +361,7 @@ const OwnerDashboard = () => {
           >
             <EnhancedCard className="p-0 overflow-hidden backdrop-blur-xl border-0">
               <div className="border-b border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm">
-                <nav className="flex space-x-1 px-6" aria-label="Tabs">
+                <nav className="flex flex-wrap gap-1 px-4 sm:px-6 overflow-x-auto scrollbar-hide" aria-label="Tabs">
                   {[
                     { id: 'overview', label: 'Overview', icon: <BarChart3 size={18} /> },
                     { id: 'boxes', label: 'My Boxes', icon: <Building size={18} /> },
@@ -348,7 +371,7 @@ const OwnerDashboard = () => {
                     <motion.button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
-                      className={`relative flex items-center space-x-2 py-4 px-6 font-medium text-sm sm:text-base transition-all duration-300 rounded-t-xl ${
+                      className={`relative flex items-center space-x-1 sm:space-x-2 py-3 sm:py-4 px-3 sm:px-6 font-medium text-xs sm:text-sm lg:text-base transition-all duration-300 rounded-t-xl whitespace-nowrap ${
                         activeTab === tab.id
                           ? 'text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800 shadow-sm'
                           : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50'
@@ -357,7 +380,8 @@ const OwnerDashboard = () => {
                       whileTap={{ y: 0 }}
                     >
                       <span className={activeTab === tab.id ? 'text-blue-600 dark:text-blue-400' : ''}>{tab.icon}</span>
-                      <span>{tab.label}</span>
+                      <span className="hidden sm:inline">{tab.label}</span>
+                      <span className="sm:hidden text-xs">{tab.label.split(' ')[0]}</span>
                       {activeTab === tab.id && (
                         <motion.div
                           className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600"
@@ -371,7 +395,7 @@ const OwnerDashboard = () => {
               </div>
 
               {/* Tab Content */}
-              <div className="p-8">
+              <div className="p-4 sm:p-6 lg:p-8">
                 {/* Overview Tab */}
                 {activeTab === 'overview' && (
                   <motion.div 
@@ -468,29 +492,38 @@ const OwnerDashboard = () => {
                     </div>
                     
                     {all_owner_boxes.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                         {all_owner_boxes.map((box, index) => (
                           <motion.div 
                             key={box.id}
                             variants={animations.staggerItem}
                             className="group"
                           >
-                            <EnhancedCard hover className="p-6 h-full">
+                            <EnhancedCard hover className="p-4 sm:p-6 h-full">
                               <div className="relative mb-4">
                                 <img
-                                  src={box.image || '/api/placeholder/300/200'}
+                                  src={
+                                    box.image 
+                                      ? (box.image.startsWith('http') 
+                                          ? box.image 
+                                          : `http://localhost:8000${box.image}`)
+                                      : 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200&q=80'
+                                  }
                                   alt={box.name}
-                                  className="w-full h-48 object-cover rounded-xl"
+                                  className="w-full h-40 sm:h-48 object-cover rounded-xl"
+                                  onError={(e) => {
+                                    e.target.src = 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200&q=80'
+                                  }}
                                 />
-                                <div className="absolute top-3 right-3">
+                                <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
                                   <EnhancedBadge 
                                     variant={
-                                      box.approval_status === 'approved' ? 'primary' : 
-                                      box.approval_status === 'pending' ? 'secondary' : 'danger'
+                                      box.status === 'approved' ? 'success' : 
+                                      box.status === 'pending' ? 'warning' : 'danger'
                                     }
                                     size="sm"
                                   >
-                                    {box.approval_status}
+                                    {box.status}
                                   </EnhancedBadge>
                                 </div>
                               </div>
@@ -502,15 +535,29 @@ const OwnerDashboard = () => {
                                 {box.location}
                               </p>
                               <p className={`text-xl font-bold mb-4 ${gradientText}`}>
-                                ₹{box.price_per_hour}/hour
+                                ₹{box.price}/hour
                               </p>
                               
-                              <div className="flex space-x-2">
-                                <EnhancedButton variant="secondary" size="sm" icon={<Eye size={16} />}>
-                                  View
+                              <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
+                                <EnhancedButton 
+                                  variant="secondary" 
+                                  size="sm" 
+                                  icon={<Eye size={14} />}
+                                  onClick={() => handleViewBox(box)}
+                                  className="w-full sm:w-auto"
+                                >
+                                  <span className="hidden sm:inline">View</span>
+                                  <span className="sm:hidden">View Details</span>
                                 </EnhancedButton>
-                                <EnhancedButton variant="secondary" size="sm" icon={<Edit size={16} />}>
-                                  Edit
+                                <EnhancedButton 
+                                  variant="secondary" 
+                                  size="sm" 
+                                  icon={<Edit size={14} />}
+                                  onClick={() => handleEditBox(box)}
+                                  className="w-full sm:w-auto"
+                                >
+                                  <span className="hidden sm:inline">Edit</span>
+                                  <span className="sm:hidden">Edit Box</span>
                                 </EnhancedButton>
                               </div>
                             </EnhancedCard>
@@ -575,10 +622,10 @@ const OwnerDashboard = () => {
                     className="space-y-8"
                     {...animations.slideInUp}
                   >
-                    <h3 className={`text-2xl font-bold ${gradientText}`}>Business Analytics</h3>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      <EnhancedCard className="p-6">
-                        <h4 className={`font-bold text-lg mb-4 ${gradientText}`}>Revenue Analytics</h4>
+                    <h3 className={`text-xl sm:text-2xl font-bold ${gradientText}`}>Business Analytics</h3>
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
+                      <EnhancedCard className="p-4 sm:p-6">
+                        <h4 className={`font-bold text-base sm:text-lg mb-4 ${gradientText}`}>Revenue Analytics</h4>
                         {revenue_chart_data.length > 0 ? (
                           <Line data={revenueData} options={chartOptions} />
                         ) : (
@@ -586,8 +633,8 @@ const OwnerDashboard = () => {
                         )}
                       </EnhancedCard>
                       
-                      <EnhancedCard className="p-6">
-                        <h4 className={`font-bold text-lg mb-4 ${gradientText}`}>Booking Trends</h4>
+                      <EnhancedCard className="p-4 sm:p-6">
+                        <h4 className={`font-bold text-base sm:text-lg mb-4 ${gradientText}`}>Booking Trends</h4>
                         {bookings_chart_data.length > 0 ? (
                           <Bar data={bookingsData} options={chartOptions} />
                         ) : (
@@ -609,6 +656,24 @@ const OwnerDashboard = () => {
         onClose={() => setShowAddBoxModal(false)} 
         onSuccess={handleAddBoxSuccess} 
       />
+
+      {/* Edit Box Modal */}
+      <AddBoxForm 
+        isOpen={showEditBoxModal} 
+        onClose={() => setShowEditBoxModal(false)} 
+        onSuccess={handleEditBoxSuccess}
+        editMode={true}
+        boxData={selectedBox}
+      />
+
+      {/* View Box Modal */}
+      {showViewBoxModal && selectedBox && (
+        <ViewBoxModal 
+          isOpen={showViewBoxModal}
+          onClose={() => setShowViewBoxModal(false)}
+          box={selectedBox}
+        />
+      )}
     </div>
   );
 };

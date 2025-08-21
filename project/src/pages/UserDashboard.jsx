@@ -35,6 +35,8 @@ import {
 } from '../components/common/AdvancedCharts';
 import { animations, gradientText, shadows, glassMorphism, useScrollAnimation } from '../utils/animations';
 import { EnhancedButton, EnhancedCard, EnhancedBadge } from '../components/common/EnhancedComponents';
+import Badge from '../components/common/Badge';
+import GamificationStats from '../components/common/GamificationStats';
 
 
 // Register Chart.js components
@@ -58,9 +60,11 @@ const UserDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [analyticsData, setAnalyticsData] = useState(null);
   const [achievements, setAchievements] = useState([]);
+  const [userGameStats, setUserGameStats] = useState(null);
   const [favoriteBoxes, setFavoriteBoxes] = useState([]);
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
   const [achievementsLoading, setAchievementsLoading] = useState(true);
+  const [gamificationLoading, setGamificationLoading] = useState(true);
   const [favoritesLoading, setFavoritesLoading] = useState(true);
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [selectedBookingToCancel, setSelectedBookingToCancel] = useState(null);
@@ -86,12 +90,27 @@ const UserDashboard = () => {
     setAchievementsLoading(true);
     try {
       const response = await api.get(`/dashboard/achievements/`);
-      setAchievements(response.data);
+      setAchievements(response.data.achievements || response.data || []);
     } catch (err) {
       console.error('Error fetching achievements:', err);
       toast.error('Failed to load achievements.');
     } finally {
       setAchievementsLoading(false);
+    }
+  }, [user]);
+
+  // Fetch Gamification Stats (memoized)
+  const fetchGamificationStats = useCallback(async () => {
+    if (!user) return;
+    setGamificationLoading(true);
+    try {
+      const response = await api.get(`/dashboard/gamification-stats/`);
+      setUserGameStats(response.data);
+    } catch (err) {
+      console.error('Error fetching gamification stats:', err);
+      // Don't show error toast for this as it's optional feature
+    } finally {
+      setGamificationLoading(false);
     }
   }, [user]);
 
@@ -111,6 +130,20 @@ const UserDashboard = () => {
     }
   }, [user]);
 
+  const removeFavorite = useCallback(async (boxId) => {
+    if (!user) return;
+    
+    try {
+      await api.delete(`/dashboard/favorites/${boxId}/remove/`);
+      toast.success('Box removed from favorites successfully!');
+      // Refresh the favorites list
+      fetchFavorites();
+    } catch (err) {
+      console.error('Error removing favorite:', err);
+      toast.error('Failed to remove box from favorites.');
+    }
+  }, [user, fetchFavorites]);
+
 
   // useEffect to call all dashboard data fetches
   useEffect(() => {
@@ -118,9 +151,10 @@ const UserDashboard = () => {
       fetchBookings(user.id);
       fetchAnalytics();
       fetchAchievements();
+      fetchGamificationStats();
       fetchFavorites();
     }
-  }, [user, fetchBookings, fetchAnalytics, fetchAchievements, fetchFavorites]);
+  }, [user, fetchBookings, fetchAnalytics, fetchAchievements, fetchGamificationStats, fetchFavorites]);
 
   // useEffect for handling favorite-added event
   useEffect(() => {
@@ -314,14 +348,14 @@ const UserDashboard = () => {
   }).sort((a, b) => new Date(`${b.date}T${b.start_time}:00`) - new Date(`${a.date}T${a.start_time}:00`));
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900 pt-20 overflow-x-hidden">
       {/* Enhanced Background Elements */}
       <motion.div 
-        className="fixed top-0 left-0 w-96 h-96 bg-gradient-to-r from-blue-400/10 to-purple-500/10 rounded-full blur-3xl"
+        className="fixed top-0 left-0 w-72 sm:w-96 h-72 sm:h-96 bg-gradient-to-r from-blue-400/10 to-purple-500/10 rounded-full blur-3xl"
         {...animations.cardFloat}
       />
       <motion.div 
-        className="fixed bottom-0 right-0 w-80 h-80 bg-gradient-to-r from-pink-400/10 to-blue-500/10 rounded-full blur-3xl"
+        className="fixed bottom-0 right-0 w-64 sm:w-80 h-64 sm:h-80 bg-gradient-to-r from-pink-400/10 to-blue-500/10 rounded-full blur-3xl"
         {...animations.cardFloat}
         transition={{ delay: 1, ...animations.cardFloat.transition }}
       />
@@ -389,7 +423,7 @@ const UserDashboard = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.6 }}
             >
-              <nav className="flex space-x-1 px-6 sm:px-8" aria-label="Tabs">
+              <nav className="flex flex-wrap gap-1 px-4 sm:px-6 lg:px-8 overflow-x-auto scrollbar-hide" aria-label="Tabs">
                 {[
                   { id: 'overview', label: 'Overview', icon: <BarChart3 size={18} /> },
                   { id: 'bookings', label: 'My Bookings', icon: <Calendar size={18} /> },
@@ -400,7 +434,7 @@ const UserDashboard = () => {
                   <motion.button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`relative flex items-center space-x-2 py-4 px-6 font-medium text-sm sm:text-base transition-all duration-300 rounded-t-xl ${
+                    className={`relative flex items-center space-x-1 sm:space-x-2 py-3 sm:py-4 px-3 sm:px-6 font-medium text-xs sm:text-sm lg:text-base transition-all duration-300 rounded-t-xl whitespace-nowrap ${
                       activeTab === tab.id
                         ? 'text-blue-600 dark:text-blue-400 bg-white dark:bg-gray-800 shadow-sm'
                         : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50'
@@ -409,7 +443,8 @@ const UserDashboard = () => {
                     whileTap={{ y: 0 }}
                   >
                     <span className={activeTab === tab.id ? 'text-blue-600 dark:text-blue-400' : ''}>{tab.icon}</span>
-                    <span>{tab.label}</span>
+                    <span className="hidden sm:inline">{tab.label}</span>
+                    <span className="sm:hidden text-xs">{tab.label.split(' ')[0]}</span>
                     {activeTab === tab.id && (
                       <motion.div
                         className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600"
@@ -423,52 +458,52 @@ const UserDashboard = () => {
             </motion.div>
 
         {/* Tab Content */}
-        <div className="p-6 sm:p-8">
+        <div className="p-4 sm:p-6 lg:p-8">
           {/* Overview Tab */}
           {activeTab === 'overview' && (
             <div className="space-y-8">
               {/* Stats Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div className="bg-blue-50 dark:bg-blue-900/30 p-6 rounded-lg shadow flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-blue-600 dark:text-blue-400">Total Bookings</p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                <div className="bg-blue-50 dark:bg-blue-900/30 p-4 sm:p-6 rounded-lg shadow flex flex-col sm:flex-row items-center sm:justify-between gap-2 sm:gap-0">
+                  <div className="text-center sm:text-left">
+                    <p className="text-xs sm:text-sm font-medium text-blue-600 dark:text-blue-400">Total Bookings</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mt-1">
                       {loading ? '...' : bookings.length}
                     </p>
                   </div>
-                  <Calendar size={48} className="text-blue-400" />
+                  <Calendar size={32} className="text-blue-400 sm:w-12 sm:h-12" />
                 </div>
-                <div className="bg-green-50 dark:bg-green-900/30 p-6 rounded-lg shadow flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-green-600 dark:text-green-400">This Month's Bookings</p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+                <div className="bg-green-50 dark:bg-green-900/30 p-4 sm:p-6 rounded-lg shadow flex flex-col sm:flex-row items-center sm:justify-between gap-2 sm:gap-0">
+                  <div className="text-center sm:text-left">
+                    <p className="text-xs sm:text-sm font-medium text-green-600 dark:text-green-400">This Month's Bookings</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mt-1">
                       {analyticsLoading ? '...' : (analyticsData?.this_month_bookings || 0)}
                     </p>
                   </div>
-                  <ClockCounterClockwise size={48} className="text-green-400" />
+                  <ClockCounterClockwise size={32} className="text-green-400 sm:w-12 sm:h-12" />
                 </div>
-                <div className="bg-purple-50 dark:bg-purple-900/30 p-6 rounded-lg shadow flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-purple-600 dark:text-purple-400">Total Spent</p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+                <div className="bg-purple-50 dark:bg-purple-900/30 p-4 sm:p-6 rounded-lg shadow flex flex-col sm:flex-row items-center sm:justify-between gap-2 sm:gap-0">
+                  <div className="text-center sm:text-left">
+                    <p className="text-xs sm:text-sm font-medium text-purple-600 dark:text-purple-400">Total Spent</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mt-1">
                       {analyticsLoading ? '...' : `₹${(analyticsData?.total_spent || 0).toFixed(2)}`}
                     </p>
                   </div>
-                  <CreditCard size={48} className="text-purple-400" />
+                  <CreditCard size={32} className="text-purple-400 sm:w-12 sm:h-12" />
                 </div>
-                <div className="bg-yellow-50 dark:bg-yellow-900/30 p-6 rounded-lg shadow flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-yellow-600 dark:text-yellow-400">Favorite Boxes</p>
-                    <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
+                <div className="bg-yellow-50 dark:bg-yellow-900/30 p-4 sm:p-6 rounded-lg shadow flex flex-col sm:flex-row items-center sm:justify-between gap-2 sm:gap-0">
+                  <div className="text-center sm:text-left">
+                    <p className="text-xs sm:text-sm font-medium text-yellow-600 dark:text-yellow-400">Favorite Boxes</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mt-1">
                       {favoritesLoading ? '...' : (favoriteBoxes.length || 0)}
                     </p>
                   </div>
-                  <Heart size={48} className="text-yellow-400" />
+                  <Heart size={32} className="text-yellow-400 sm:w-12 sm:h-12" />
                 </div>
               </div>
 
-              {/* Recent Activity & Favorite Sports (Doughnut Chart) */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Recent Activity & Gamification Overview */}
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
                 <div className="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
                   <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Recent Activity</h3>
                   {loading ? (
@@ -480,19 +515,19 @@ const UserDashboard = () => {
                   ) : (
                     <div className="space-y-3">
                       {bookings.slice(0, 4).map((booking) => (
-                        <div key={booking.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150">
+                        <div key={booking.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-150 gap-3 sm:gap-0">
                           <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center text-white font-medium text-lg">
+                            <div className="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center text-white font-medium text-lg flex-shrink-0">
                               {(booking.box?.sport || booking.box_sport)?.charAt(0).toUpperCase() ?? 'S'}
                             </div>
-                            <div>
-                              <p className="font-medium text-gray-900 dark:text-gray-100">{booking.box?.name || booking.box_name || 'Unknown Box'}</p>
-                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <div className="min-w-0 flex-1">
+                              <p className="font-medium text-gray-900 dark:text-gray-100 truncate">{booking.box?.name || booking.box_name || 'Unknown Box'}</p>
+                              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                                 {new Date(booking.date).toLocaleDateString()} • {booking.start_time} - {booking.end_time}
                               </p>
                             </div>
                           </div>
-                          <div className="text-right">
+                          <div className="text-left sm:text-right flex sm:flex-col justify-between sm:justify-start">
                             <span className="text-primary-600 dark:text-primary-400 font-medium">₹{booking.total_amount}</span>
                             <p className={`text-xs font-semibold ${booking.booking_status === 'Cancelled' ? 'text-red-500' : 'text-green-500'}`}>
                               {booking.booking_status}
@@ -504,13 +539,53 @@ const UserDashboard = () => {
                   )}
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                  <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">Favorite Sports</h3>
-                  {analyticsLoading ? (
-                    <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">Loading chart...</div>
+                <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow">
+                  <h3 className="text-base sm:text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200 flex items-center">
+                    <Trophy className="mr-2 text-yellow-500" size={20} />
+                    Your Level
+                  </h3>
+                  {gamificationLoading ? (
+                    <div className="text-center py-4 text-gray-500 dark:text-gray-400">Loading...</div>
+                  ) : userGameStats ? (
+                    <div className="space-y-4">
+                      <div className="text-center">
+                        <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl mb-2">
+                          {userGameStats.points >= 1000 ? '5' : 
+                           userGameStats.points >= 500 ? '4' : 
+                           userGameStats.points >= 200 ? '3' : 
+                           userGameStats.points >= 50 ? '2' : '1'}
+                        </div>
+                        <h4 className="font-semibold text-gray-900 dark:text-white">
+                          {userGameStats.points >= 1000 ? 'Sports Legend' : 
+                           userGameStats.points >= 500 ? 'Sports Master' : 
+                           userGameStats.points >= 200 ? 'Sports Expert' : 
+                           userGameStats.points >= 50 ? 'Sports Enthusiast' : 'Beginner'}
+                        </h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{userGameStats.points} points</p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600 dark:text-gray-400">Badges</span>
+                          <span className="font-medium">{userGameStats.badges_earned || 0}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600 dark:text-gray-400">This Week</span>
+                          <span className="font-medium">{userGameStats.weekly_bookings || 0}/3</span>
+                        </div>
+                      </div>
+                      
+                      <button 
+                        onClick={() => setActiveTab('achievements')}
+                        className="w-full px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200 text-sm font-medium"
+                      >
+                        View All Achievements
+                      </button>
+                    </div>
                   ) : (
-                    <div className="h-64">
-                      <Doughnut data={doughnutData} options={doughnutOptions} />
+                    <div className="text-center py-4">
+                      <Trophy className="w-12 h-12 mx-auto text-gray-400 mb-2" />
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Start booking to begin your journey!</p>
                     </div>
                   )}
                 </div>
@@ -833,32 +908,119 @@ const UserDashboard = () => {
 
           {/* Achievements Tab */}
           {activeTab === 'achievements' && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Achievements</h2>
-              {achievementsLoading ? (
-                <div className="text-center py-10 text-gray-500">Loading achievements...</div>
-              ) : !Array.isArray(achievements) || achievements.length === 0 ? (
-                <div className="text-center py-10 text-gray-600 bg-gray-50 rounded-lg">
-                  <p>No achievements yet. Keep booking sessions to unlock them!</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {achievements.filter(Boolean).map((achievement, idx) => (
-                    <div key={achievement?.id || achievement?.name || idx} className={`p-6 rounded-lg shadow flex items-center space-x-4 ${achievement?.earned ? 'bg-gradient-to-br from-green-100 to-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200 opacity-75'}`}>
-                      <div className={`text-4xl ${achievement?.earned ? 'text-green-600' : 'text-gray-400'}`}>
-                        <Trophy size={32} />
+            <div className="space-y-8">
+              <div className="flex items-center space-x-3 mb-6">
+                <Trophy size={28} className="text-yellow-600" />
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                  Your Gaming Progress & Achievements
+                </h2>
+              </div>
+
+              {/* Gamification Stats */}
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                  <Sparkles className="mr-2 text-purple-600" />
+                  Your Sports Journey
+                </h3>
+                <GamificationStats userStats={userGameStats} loading={gamificationLoading} />
+              </div>
+
+              {/* Achievements Grid */}
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                  <Trophy className="mr-2 text-yellow-600" />
+                  Achievement Badges
+                </h3>
+                
+                {achievementsLoading ? (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {[...Array(8)].map((_, i) => (
+                      <div key={i} className="bg-white p-6 rounded-lg shadow animate-pulse">
+                        <div className="w-16 h-16 bg-gray-300 rounded-full mx-auto mb-4"></div>
+                        <div className="h-4 bg-gray-300 rounded mb-2"></div>
+                        <div className="h-3 bg-gray-300 rounded"></div>
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-lg text-gray-900">{achievement?.name || 'Achievement'}</h3>
-                        <p className="text-sm text-gray-700">{achievement?.description || ''}</p>
-                        {achievement?.earned && (
-                          <span className="mt-2 inline-block px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Earned!</span>
-                        )}
+                    ))}
+                  </div>
+                ) : !Array.isArray(achievements) || achievements.length === 0 ? (
+                  <div className="text-center py-12 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl">
+                    <Trophy size={64} className="mx-auto mb-4 text-gray-400" />
+                    <p className="text-lg text-gray-600 dark:text-gray-400 mb-2">No achievements unlocked yet!</p>
+                    <p className="text-gray-500 dark:text-gray-500">Keep booking sessions to earn your first badge.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {achievements.filter(Boolean).map((achievement, idx) => {
+                      // Determine badge type based on achievement name
+                      let badgeType = 'default';
+                      const name = achievement?.name?.toLowerCase() || '';
+                      if (name.includes('first') || name.includes('timer')) badgeType = 'bronze';
+                      else if (name.includes('weekly') || name.includes('warrior')) badgeType = 'silver';
+                      else if (name.includes('regular') || name.includes('player')) badgeType = 'gold';
+                      else if (name.includes('sports') || name.includes('enthusiast')) badgeType = 'platinum';
+                      else if (name.includes('spender') || name.includes('big')) badgeType = 'gold';
+                      else if (name.includes('monthly') || name.includes('champion')) badgeType = 'platinum';
+
+                      return (
+                        <Badge
+                          key={achievement?.id || achievement?.name || idx}
+                          name={achievement?.name || 'Achievement'}
+                          description={achievement?.description || ''}
+                          earned={achievement?.earned || false}
+                          type={badgeType}
+                          size="md"
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Achievement Progress */}
+                {achievements.length > 0 && (
+                  <div className="mt-8 bg-white dark:bg-gray-800 p-6 rounded-xl shadow">
+                    <h4 className="text-lg font-semibold mb-4 flex items-center">
+                      <TrendingUp className="mr-2 text-green-600" />
+                      Progress Summary
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-green-600">
+                          {achievements.filter(a => a?.earned).length}
+                        </div>
+                        <div className="text-gray-600 dark:text-gray-400">Badges Earned</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-blue-600">
+                          {achievements.length}
+                        </div>
+                        <div className="text-gray-600 dark:text-gray-400">Total Available</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-purple-600">
+                          {achievements.length > 0 ? Math.round((achievements.filter(a => a?.earned).length / achievements.length) * 100) : 0}%
+                        </div>
+                        <div className="text-gray-600 dark:text-gray-400">Completion Rate</div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                    
+                    {/* Progress Bar */}
+                    <div className="mt-6">
+                      <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        <span>Achievement Progress</span>
+                        <span>{achievements.filter(a => a?.earned).length} / {achievements.length}</span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                        <div 
+                          className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-1000 ease-out"
+                          style={{ 
+                            width: `${achievements.length > 0 ? (achievements.filter(a => a?.earned).length / achievements.length) * 100 : 0}%` 
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -895,7 +1057,7 @@ const UserDashboard = () => {
                             View Box
                           </button>
                           <button
-                            onClick={() => toast.info('Remove from favorites functionality needs backend integration.')}
+                            onClick={() => removeFavorite(fav.id)}
                             className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 text-sm"
                           >
                             Remove

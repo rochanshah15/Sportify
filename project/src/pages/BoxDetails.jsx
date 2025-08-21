@@ -10,6 +10,7 @@ import { useBooking } from '../context/BookingContext';
 import Modal from '../components/common/Modal';
 import Loader from '../components/common/Loader';
 import Chatbot from '../components/common/Chatbot';
+import AddReviewForm from '../components/common/AddReviewForm';
 import { EnhancedButton } from '../components/common/EnhancedComponents';
 
 // Import Swiper styles
@@ -37,6 +38,7 @@ const BoxDetails = () => {
     const [error, setError] = useState(null);
     const [bookedSlots, setBookedSlots] = useState([]); // New state for booked time slots
     const [slotsLoading, setSlotsLoading] = useState(false); // Loading state for slots
+    const [showReviewModal, setShowReviewModal] = useState(false); // State for review modal
     const { boxes } = useBox();
     const { createBooking } = useBooking();
     const { isAuthenticated, user } = useAuth();
@@ -172,6 +174,38 @@ const BoxDetails = () => {
         'WiFi': Wifi,
         'Refreshments': Coffee,
         'Security': Shield
+    };
+
+    // Handle when a new review is added
+    const handleReviewAdded = (newReview) => {
+        // Add the new review to the box's reviews array
+        setBox(prevBox => ({
+            ...prevBox,
+            reviews: [newReview, ...(prevBox.reviews || [])]
+        }));
+        
+        // Close the review modal
+        setShowReviewModal(false);
+        
+        // Optionally refresh the entire box data to get updated rating
+        setTimeout(() => {
+            const fetchBoxDetails = async () => {
+                try {
+                    const response = await api.get(`/boxes/public/${id}/`);
+                    const fetchedBox = response.data;
+                    if (fetchedBox && typeof fetchedBox.rating === 'string') {
+                        fetchedBox.rating = parseFloat(fetchedBox.rating);
+                    }
+                    if (fetchedBox && (fetchedBox.rating === undefined || fetchedBox.rating === null)) {
+                        fetchedBox.rating = 0;
+                    }
+                    setBox(fetchedBox);
+                } catch (err) {
+                    console.error('Error refreshing box details:', err);
+                }
+            };
+            fetchBoxDetails();
+        }, 1000);
     };
 
     // This function now directly handles the booking submission to the backend
@@ -461,7 +495,19 @@ const BoxDetails = () => {
                                 transition={{ delay: 0.4 }}
                                 className="card p-6"
                             >
-                                <h3 className="text-lg font-semibold mb-4">Reviews</h3>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-semibold">Reviews</h3>
+                                    {isAuthenticated && (
+                                        <EnhancedButton
+                                            onClick={() => setShowReviewModal(true)}
+                                            variant="primary"
+                                            size="sm"
+                                            icon={<Star size={16} />}
+                                        >
+                                            Add Review
+                                        </EnhancedButton>
+                                    )}
+                                </div>
                                 <div className="space-y-4">
                                     {box.reviews && Array.isArray(box.reviews) && box.reviews.length > 0 ? box.reviews.map((review) => (
                                         <div key={review.id} className="border-b border-gray-200 dark:border-gray-700 pb-4 last:border-b-0">
@@ -686,6 +732,14 @@ const BoxDetails = () => {
                     </div>
                 </div>
             </Modal>
+
+            {/* Add Review Modal */}
+            <AddReviewForm
+                isOpen={showReviewModal}
+                onClose={() => setShowReviewModal(false)}
+                boxId={box.id}
+                onReviewAdded={handleReviewAdded}
+            />
 
             {/* Chatbot Component */}
             <Chatbot />

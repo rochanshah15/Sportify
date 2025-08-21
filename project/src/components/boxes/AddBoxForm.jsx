@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, X, MapPin, DollarSign, FileText, Check, UploadCloud } from 'lucide-react';
 import { useBox } from '../../context/BoxContext';
 
-const AddBoxForm = ({ isOpen, onClose, onSuccess }) => {
+const AddBoxForm = ({ isOpen, onClose, onSuccess, editMode = false, boxData = null }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     name: '',
@@ -24,7 +24,45 @@ const AddBoxForm = ({ isOpen, onClose, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const { addBox } = useBox();
+  const { addBox, updateBox } = useBox();
+
+  // Populate form data when in edit mode
+  useEffect(() => {
+    if (editMode && boxData) {
+      setFormData({
+        name: boxData.name || '',
+        sports: boxData.sports || [],
+        location: boxData.location || '',
+        price: boxData.price || '',
+        capacity: boxData.capacity || '',
+        description: boxData.description || '',
+        amenities: boxData.amenities || [],
+        images: [], // Don't populate existing images as they're already uploaded
+        rules: boxData.rules || '',
+        contactInfo: boxData.contact_info || '',
+        full_description: boxData.full_description || '',
+        latitude: boxData.latitude || '',
+        longitude: boxData.longitude || ''
+      });
+    } else if (!editMode) {
+      // Reset form for add mode
+      setFormData({
+        name: '',
+        sports: [],
+        location: '',
+        price: '',
+        capacity: '',
+        description: '',
+        amenities: [],
+        images: [],
+        rules: '',
+        contactInfo: '',
+        full_description: '',
+        latitude: '',
+        longitude: ''
+      });
+    }
+  }, [editMode, boxData, isOpen]);
 
   const availableSports = [
     'Cricket', 'Football', 'Tennis', 'Badminton', 'Basketball', 
@@ -81,7 +119,12 @@ const AddBoxForm = ({ isOpen, onClose, onSuccess }) => {
       case 3:
         if (!formData.location.trim()) newErrors.location = 'Location is required';
         if (formData.amenities.length === 0) newErrors.amenities = 'Select at least one amenity';
-        if (formData.images.length === 0) newErrors.images = 'Please upload at least one image for your facility.';
+        // Only require images if not in edit mode or if there's no existing image
+        if (!editMode && formData.images.length === 0) {
+          newErrors.images = 'Please upload at least one image for your facility.';
+        } else if (editMode && !boxData?.image && formData.images.length === 0) {
+          newErrors.images = 'Please upload at least one image for your facility.';
+        }
         break;
     }
     setErrors(newErrors);
@@ -108,14 +151,19 @@ const AddBoxForm = ({ isOpen, onClose, onSuccess }) => {
     setIsSubmitting(true);
     setErrors({});
     try {
-      const result = await addBox(formData);
+      let result;
+      if (editMode && boxData?.id) {
+        result = await updateBox(boxData.id, formData);
+      } else {
+        result = await addBox(formData);
+      }
       
       if (result.success) {
         setSubmitted(true);
         setTimeout(() => {
           onSuccess?.();
           onClose();
-          setFormData({ name: '', sports: [], location: '', price: '', capacity: '', description: '', amenities: [], images: [], rules: '', contactInfo: '' });
+          setFormData({ name: '', sports: [], location: '', price: '', capacity: '', description: '', amenities: [], images: [], rules: '', contactInfo: '', full_description: '', latitude: '', longitude: '' });
           setCurrentStep(1);
           setSubmitted(false);
         }, 2000);
@@ -136,8 +184,15 @@ const AddBoxForm = ({ isOpen, onClose, onSuccess }) => {
       <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-md w-full text-center">
           <div className="w-16 h-16 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-4"><Check size={32} className="text-green-600 dark:text-green-400" /></div>
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Box Submitted Successfully!</h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">Your sports box has been submitted and is now <span className="font-semibold text-yellow-600 dark:text-yellow-400">pending admin approval</span>. You'll be notified once it's reviewed and approved.</p>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+            {editMode ? 'Box Updated Successfully!' : 'Box Submitted Successfully!'}
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            {editMode 
+              ? 'Your sports box has been updated successfully.'
+              : 'Your sports box has been submitted and is now pending admin approval. You\'ll be notified once it\'s reviewed and approved.'
+            }
+          </p>
         </motion.div>
       </div>
     )
@@ -148,7 +203,9 @@ const AddBoxForm = ({ isOpen, onClose, onSuccess }) => {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-2xl font-bold text-gray-900">Add New Sports Box</h2>
+          <h2 className="text-2xl font-bold text-gray-900">
+            {editMode ? 'Edit Sports Box' : 'Add New Sports Box'}
+          </h2>
           <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"><X size={20} /></button>
         </div>
 
@@ -234,10 +291,30 @@ const AddBoxForm = ({ isOpen, onClose, onSuccess }) => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Facility Images *</label>
+                
+                {/* Show existing image in edit mode */}
+                {editMode && boxData?.image && (
+                  <div className="mb-4">
+                    <p className="text-sm text-gray-600 mb-2">Current Image:</p>
+                    <img 
+                      src={boxData.image.startsWith('http') ? boxData.image : `http://localhost:8000${boxData.image}`}
+                      alt="Current box image"
+                      className="h-32 w-full object-cover rounded-md"
+                      onError={(e) => {
+                        e.target.src = 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                      }}
+                    />
+                    <p className="text-sm text-gray-500 mt-1">Upload new images to replace the current image</p>
+                  </div>
+                )}
+                
                 <div className={`mt-1 flex justify-center px-6 pt-5 pb-6 border-2 ${errors.images ? 'border-red-500' : 'border-gray-300'} border-dashed rounded-md`}>
                     <div className="space-y-1 text-center">
                         <UploadCloud className="mx-auto h-12 w-12 text-gray-400" />
-                        <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500"><span>Upload files</span><input id="file-upload" type="file" className="sr-only" multiple onChange={handleImageChange} accept="image/*"/></label>
+                        <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500">
+                          <span>{editMode ? 'Upload new files' : 'Upload files'}</span>
+                          <input id="file-upload" type="file" className="sr-only" multiple onChange={handleImageChange} accept="image/*"/>
+                        </label>
                     </div>
                 </div>
                 {errors.images && <p className="text-red-500 text-sm mt-1">{errors.images}</p>}
@@ -291,7 +368,7 @@ const AddBoxForm = ({ isOpen, onClose, onSuccess }) => {
           <div>{currentStep > 1 && (<button onClick={handlePrevious} className="btn-secondary">Previous</button>)}</div>
           <div className="flex items-center space-x-3">
             <button onClick={onClose} className="btn-secondary">Cancel</button>
-            {currentStep < 4 ? (<button onClick={handleNext} className="btn-primary">Next</button>) : (<button onClick={handleSubmit} disabled={isSubmitting} className="btn-primary disabled:opacity-50">{isSubmitting ? 'Submitting...' : 'Submit for Approval'}</button>)}
+            {currentStep < 4 ? (<button onClick={handleNext} className="btn-primary">Next</button>) : (<button onClick={handleSubmit} disabled={isSubmitting} className="btn-primary disabled:opacity-50">{isSubmitting ? (editMode ? 'Updating...' : 'Submitting...') : (editMode ? 'Update Box' : 'Submit for Approval')}</button>)}
           </div>
         </div>
       </motion.div>

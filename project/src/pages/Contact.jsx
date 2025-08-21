@@ -139,13 +139,13 @@ const Contact = () => {
     {
       icon: Phone,
       title: 'Call Us',
-      details: '+91 98765 43210',
+      details: '+91 98253 27667',
       description: 'Mon-Fri from 8am to 6pm'
     },
     {
       icon: MapPin,
       title: 'Visit Us',
-      details: '123 Sports Street, Andheri West, Mumbai - 400058',
+      details: 'D/89 Ananya Society, Ahmedabad, Gujarat - 380050',
       description: 'Come say hello at our office'
     },
     {

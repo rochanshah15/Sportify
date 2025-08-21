@@ -73,6 +73,47 @@ export const BoxProvider = ({ children }) => {
         }
     }, []); // fetchOwnerBoxes is defined below
 
+    const updateBox = useCallback(async (boxId, boxData) => {
+        setLoading(true);
+        setError(null);
+        const formData = new FormData();
+        // Always send 'sport' as first selected sport for backend compatibility
+        if (boxData.sports && boxData.sports.length > 0) {
+            formData.append('sport', boxData.sports[0]);
+        }
+        Object.keys(boxData).forEach(key => {
+            if (key === 'images' || key === 'sport') return;
+            let value = boxData[key];
+            // For amenities, sports, rules: always send as JSON string
+            if (["amenities", "sports", "rules"].includes(key)) {
+                formData.append(key, JSON.stringify(value));
+            } else if (value !== null && value !== undefined) {
+                formData.append(key, value);
+            }
+        });
+        // Add new images if any
+        if (boxData.images && boxData.images.length > 0) {
+            boxData.images.forEach((file, idx) => {
+                formData.append('images', file);
+                if (idx === 0) formData.append('image', file);
+            });
+        }
+        try {
+            await api.put(`/boxes/owner/${boxId}/`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            await fetchOwnerBoxes();
+            return { success: true };
+        } catch (err) {
+            console.error('Error updating box:', err.response?.data);
+            const errorMessage = err.response?.data?.detail || Object.values(err.response?.data || {})[0]?.[0] || 'Failed to update the box.';
+            setError(errorMessage);
+            return { success: false, error: errorMessage };
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     const fetchOwnerBoxes = useCallback(async () => {
         setLoading(true);
         try {
@@ -193,6 +234,7 @@ export const BoxProvider = ({ children }) => {
         fetchNearbyBoxes,
         fetchOwnerBoxes,
         addBox,
+        updateBox,
         filters,
         setFilters,
         clearFiltersAndRefresh: () => {
