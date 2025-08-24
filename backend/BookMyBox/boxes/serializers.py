@@ -16,6 +16,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 class BoxSerializer(serializers.ModelSerializer):
     images = serializers.SerializerMethodField()
     reviews = ReviewSerializer(many=True, read_only=True)
+    image = serializers.SerializerMethodField()
 
     class Meta:
         model = Box
@@ -25,22 +26,41 @@ class BoxSerializer(serializers.ModelSerializer):
             'full_description', 'rules', 'latitude', 'longitude', 'reviews'
         ]
 
+    def get_image(self, obj):
+        """Handle both external URLs and local file paths properly"""
+        if not obj.image:
+            return None
+        
+        # If the image field contains a full URL (starts with http), return it directly
+        image_str = str(obj.image)
+        if image_str.startswith('http'):
+            return image_str
+        
+        # Otherwise, build the URL for local files
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(obj.image.url)
+        return obj.image.url
+
     def get_images(self, obj):
         request = self.context.get('request')
-        # If request is None (e.g., in a shell), return paths without domain
-        if not request:
-            if obj.image:
-                return [obj.image.url] + obj.images
-            return obj.images
-
-        # Build absolute URLs if request context is available
         all_image_urls = []
-        if obj.image:
-            all_image_urls.append(request.build_absolute_uri(obj.image.url))
+        
+        # Add main image
+        main_image = self.get_image(obj)
+        if main_image:
+            all_image_urls.append(main_image)
+        
+        # Add additional images from images field
         if obj.images:
-            # Assuming 'images' stores full paths or needs similar building
             for img_path in obj.images:
-                all_image_urls.append(request.build_absolute_uri(img_path))
+                if img_path.startswith('http'):
+                    all_image_urls.append(img_path)
+                elif request:
+                    all_image_urls.append(request.build_absolute_uri(img_path))
+                else:
+                    all_image_urls.append(img_path)
+        
         return all_image_urls
 
 # --- ADDED: A new serializer for owners to create/update their boxes ---
