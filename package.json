@@ -1,0 +1,12 @@
+{
+  "name": "bookmybox-deployment",
+  "version": "1.0.0",
+  "description": "Full-stack deployment for BookMyBox",
+  "scripts": {
+    "build": "cd project && npm ci && npm run build"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

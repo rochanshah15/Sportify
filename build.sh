@@ -7,10 +7,26 @@ echo "Current directory: $(pwd)"
 echo "Directory contents:"
 ls -la
 
-# Install dependencies
+# Install Python dependencies
 echo "Installing Python dependencies..."
 pip install --upgrade pip
 pip install -r requirements.txt
+
+# Build React frontend
+echo "Building React frontend..."
+if [ -d "project" ]; then
+    cd project
+    npm ci
+    npm run build
+    
+    # Copy React build to Django static directory
+    echo "Copying React build to Django static directory..."
+    mkdir -p ../backend/BookMyBox/static
+    cp -r dist/* ../backend/BookMyBox/static/
+    cd ..
+else
+    echo "Warning: project directory not found, skipping frontend build"
+fi
 
 echo "Running Django management commands..."
 # Use root manage.py for Django commands
