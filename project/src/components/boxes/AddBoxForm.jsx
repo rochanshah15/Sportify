@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Plus, X, MapPin, DollarSign, FileText, Check, UploadCloud } from 'lucide-react';
 import { useBox } from '../../context/BoxContext';
+import { getMediaUrl } from '../../utils/apiConfig';
 
 const AddBoxForm = ({ isOpen, onClose, onSuccess, editMode = false, boxData = null }) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -297,7 +298,7 @@ const AddBoxForm = ({ isOpen, onClose, onSuccess, editMode = false, boxData = nu
                   <div className="mb-4">
                     <p className="text-sm text-gray-600 mb-2">Current Image:</p>
                     <img 
-                      src={boxData.image.startsWith('http') ? boxData.image : `http://localhost:8000${boxData.image}`}
+                      src={getMediaUrl(boxData.image)}
                       alt="Current box image"
                       className="h-32 w-full object-cover rounded-md"
                       onError={(e) => {

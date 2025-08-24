@@ -11,6 +11,7 @@ import {
 import AddBoxForm from '../components/boxes/AddBoxForm';
 import ViewBoxModal from '../components/boxes/ViewBoxModal';
 import { useAuth, api } from '../api.jsx';
+import { getMediaUrl } from '../utils/apiConfig.js';
 import { useBox } from '../context/BoxContext';
 import { 
   EnhancedRevenueTrend, 
@@ -504,9 +505,7 @@ const OwnerDashboard = () => {
                                 <img
                                   src={
                                     box.image 
-                                      ? (box.image.startsWith('http') 
-                                          ? box.image 
-                                          : `http://localhost:8000${box.image}`)
+                                      ? getMediaUrl(box.image)
                                       : 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=200&q=80'
                                   }
                                   alt={box.name}

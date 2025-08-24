@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Phone, MapPin, Building, BriefcaseBusiness, UserCheck } from 'lucide-react';
+import { getApiUrl } from '../utils/apiConfig.js';
 
 const OnboardingPage = () => {
   const location = useLocation();
@@ -62,7 +63,7 @@ const OnboardingPage = () => {
     
     try {
       const token = localStorage.getItem('accessToken');
-      const response = await fetch('http://localhost:8000/api/user/complete-onboarding/', {
+      const response = await fetch(`${getApiUrl()}/api/user/complete-onboarding/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

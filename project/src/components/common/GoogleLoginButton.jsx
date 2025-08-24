@@ -2,6 +2,7 @@ import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import { getApiUrl } from '../../utils/apiConfig.js';
 
 const GoogleLoginButton = ({ setLoading, setErrors }) => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const GoogleLoginButton = ({ setLoading, setErrors }) => {
       const googleUser = jwtDecode(credentialResponse.credential);
       
       // Send to your backend
-      const response = await fetch('http://localhost:8000/api/user/google-auth/', {
+      const response = await fetch(`${getApiUrl()}/api/user/google-auth/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
