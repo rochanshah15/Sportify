@@ -19,10 +19,19 @@ if [ -d "project" ]; then
     npm ci
     npm run build
     
-    # Copy React build to Django static directory
+    # Copy React build to Django static directory with correct structure
     echo "Copying React build to Django static directory..."
     mkdir -p ../backend/BookMyBox/static
+    rm -rf ../backend/BookMyBox/static/*
     cp -r dist/* ../backend/BookMyBox/static/
+    
+    echo "Static files copied successfully:"
+    ls -la ../backend/BookMyBox/static/
+    if [ -d "../backend/BookMyBox/static/assets" ]; then
+        echo "Assets directory contents:"
+        ls -la ../backend/BookMyBox/static/assets/
+    fi
+    
     cd ..
 else
     echo "Warning: project directory not found, skipping frontend build"
