@@ -27,20 +27,8 @@ class BoxSerializer(serializers.ModelSerializer):
         ]
 
     def get_image(self, obj):
-        """Handle both external URLs and local file paths properly"""
-        if not obj.image:
-            return None
-        
-        # If the image field contains a full URL (starts with http), return it directly
-        image_str = str(obj.image)
-        if image_str.startswith('http'):
-            return image_str
-        
-        # Otherwise, build the URL for local files
-        request = self.context.get('request')
-        if request:
-            return request.build_absolute_uri(obj.image.url)
-        return obj.image.url
+        """Return the effective image URL - external URL or local file URL"""
+        return obj.effective_image_url
 
     def get_images(self, obj):
         request = self.context.get('request')

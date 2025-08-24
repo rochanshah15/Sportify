@@ -75,14 +75,14 @@ class Command(BaseCommand):
                 images_list = real_image_urls[sport]
                 # Use the first image as main image, rotate through available images
                 new_image_url = images_list[updated_count % len(images_list)]
-                box.image = new_image_url
+                box.image_url = new_image_url
                 box.save()
                 updated_count += 1
                 self.stdout.write(f"Updated {box.name} ({sport}) with real ground image")
             else:
                 # Use a default sports facility image
                 default_url = "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop&auto=format"
-                box.image = default_url
+                box.image_url = default_url
                 box.save()
                 updated_count += 1
                 self.stdout.write(f"Updated {box.name} with default sports facility image")

@@ -42,6 +42,7 @@ class Box(models.Model):
     capacity = models.IntegerField(default=1)
     
     image = models.ImageField(upload_to='box_images/', null=True, blank=True)
+    image_url = models.URLField(max_length=500, null=True, blank=True, help_text="External image URL (e.g., Unsplash)")
     images = models.JSONField(default=list, blank=True)
     amenities = models.JSONField(default=list, blank=True)
     description = models.TextField(blank=True)
@@ -52,6 +53,15 @@ class Box(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def effective_image_url(self):
+        """Return the effective image URL - either external URL or uploaded file URL"""
+        if self.image_url:
+            return self.image_url
+        elif self.image:
+            return self.image.url
+        return None
 
     def __str__(self):
         return self.name
