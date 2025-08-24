@@ -13,8 +13,6 @@
     "@headlessui/react": "^2.2.4",
     "@phosphor-icons/react": "^2.1.10",
     "@react-oauth/google": "^0.12.2",
-    "@stripe/react-stripe-js": "^3.7.0",
-    "@stripe/stripe-js": "^1.29.0",
     "axios": "^1.10.0",
     "chart.js": "^4.4.0",
     "emailjs-com": "^3.2.0",
@@ -31,7 +29,6 @@
     "react-leaflet": "^4.2.1",
     "react-router-dom": "^6.26.0",
     "react-toastify": "^11.0.5",
-    "stripe": "^18.3.0",
     "swiper": "^11.1.0"
   },
   "devDependencies": {

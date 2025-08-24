@@ -67,12 +67,12 @@ const Chatbot = () => {
                 })
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to get response');
-            }
-
             const data = await response.json();
             
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
+            }
+
             // Update session ID if provided
             if (data.session_id && data.session_id !== sessionId) {
                 setSessionId(data.session_id);
@@ -88,13 +88,26 @@ const Chatbot = () => {
             setMessages(prev => [...prev, botMessage]);
         } catch (error) {
             console.error('Chatbot error:', error);
-            const errorMessage = {
+            
+            let errorMessage = "I'm sorry, I'm having trouble connecting right now. ";
+            
+            if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                errorMessage += "Please check if the backend server is running at http://localhost:8000 and try again.";
+            } else if (error.message.includes('HTTP 500')) {
+                errorMessage += "There's a server-side issue. Please try again in a moment.";
+            } else if (error.message.includes('HTTP 400')) {
+                errorMessage += "There was an issue with your message format. Please try rephrasing.";
+            } else {
+                errorMessage += "Please try again later or contact our support team.";
+            }
+            
+            const errorBotMessage = {
                 id: Date.now() + 1,
                 type: 'bot',
-                content: "I'm sorry, I'm having trouble connecting right now. Please try again later or contact our support team.",
+                content: errorMessage,
                 timestamp: new Date()
             };
-            setMessages(prev => [...prev, errorMessage]);
+            setMessages(prev => [...prev, errorBotMessage]);
         } finally {
             setIsLoading(false);
         }

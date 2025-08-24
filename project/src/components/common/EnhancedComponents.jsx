@@ -10,9 +10,10 @@ export const EnhancedButton = ({
   className = '', 
   icon,
   loading = false,
+  as: Component = 'button',
   ...props 
 }) => {
-  const baseClasses = "relative overflow-hidden font-semibold transition-all duration-300 rounded-xl";
+  const baseClasses = "relative overflow-hidden font-semibold transition-all duration-300 rounded-xl inline-flex items-center justify-center";
   
   const variants = {
     primary: `bg-gradient-to-r from-blue-600 to-purple-600 text-white ${shadows.medium} hover:${shadows.strong}`,
@@ -28,8 +29,10 @@ export const EnhancedButton = ({
     xl: "px-10 py-5 text-xl"
   };
 
+  const MotionComponent = motion(Component);
+
   return (
-    <motion.button
+    <MotionComponent
       className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`}
       {...(variant === 'primary' ? animations.buttonPrimary : animations.buttonSecondary)}
       disabled={loading}
@@ -47,7 +50,7 @@ export const EnhancedButton = ({
         {icon && <span>{icon}</span>}
         {children}
       </span>
-    </motion.button>
+    </MotionComponent>
   );
 };
 

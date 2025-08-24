@@ -193,12 +193,12 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # React development server
     "http://127.0.0.1:5173",
-    # "http://localhost:5174",  # React development server (alternate port)
+    # "http://localhost:5174", 
     # "http://127.0.0.1:5174",
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True # For development only, set to False in production
-CORS_ALLOW_CREDENTIALS = True # Allow cookies to be sent
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     "accept",
     "accept-encoding",
@@ -211,41 +211,12 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
-# Demo Credentials for development
-DEMO_CREDENTIALS = {
-    'user': {
-        'email': 'user@demo.com',
-        'password': 'demo123',
-        'name': 'Demo User',
-        'phone': '1234567890',
-        'role': 'user'
-    },
-    'owner': {
-        'email': 'owner@demo.com',
-        'password': 'demo123',
-        'name': 'Demo Owner',
-        'phone': '1234567891',
-        'role': 'owner',
-        'business_name': 'Demo Sports Center'
-    },
-    'admin': {
-        'email': 'admin@demo.com',
-        'password': 'demo123',
-        'name': 'Demo Admin',
-        'phone': '1234567892',
-        'role': 'admin'
-    }
-}
-AUTH_USER_MODEL = 'user.User'
 
-# Stripe Secret Key
-STRIPE_SECRET_KEY = 'sk_test_YOUR_STRIPE_SECRET_KEY' # Replace with your actual key
-# STRIPE_PUBLIC_KEY = 'pk_test_YOUR_STRIPE_PUBLIC_KEY' # Also needed for frontend, usually configured there.
+AUTH_USER_MODEL = 'user.User'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# your_project/settings.py
 
 JAZZMIN_SETTINGS = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
