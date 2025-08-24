@@ -2,10 +2,17 @@
 # exit on error
 set -o errexit
 
+echo "Starting build process..."
+echo "Current directory: $(pwd)"
+echo "Directory contents:"
+ls -la
+
 # Install dependencies
+echo "Installing Python dependencies..."
 pip install --upgrade pip
 pip install -r requirements.txt
 
+echo "Running Django management commands..."
 # Use root manage.py for Django commands
 python manage.py collectstatic --noinput
 python manage.py migrate
@@ -20,5 +27,8 @@ if not User.objects.filter(is_superuser=True).exists():
 else:
     print('Superuser already exists')
 "
+
+# Make scripts executable
+chmod +x start.sh
 
 echo "Build completed successfully!"

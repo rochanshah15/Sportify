@@ -5,14 +5,26 @@ import sys
 from pathlib import Path
 
 if __name__ == '__main__':
-    # Add the Django project directory to Python path
-    django_project_path = Path(__file__).resolve().parent / 'backend' / 'BookMyBox'
-    sys.path.insert(0, str(django_project_path))
+    # Get the absolute path to the root directory
+    root_dir = Path(__file__).resolve().parent
+    backend_dir = root_dir / 'backend' / 'BookMyBox'
+    
+    # Add both directories to Python path
+    sys.path.insert(0, str(root_dir))
+    sys.path.insert(0, str(backend_dir))
     
     # Change working directory to Django project
-    os.chdir(str(django_project_path))
+    if backend_dir.exists():
+        os.chdir(str(backend_dir))
+    else:
+        # Fallback if directory structure is different
+        print(f"Backend directory not found at {backend_dir}")
+        print(f"Current working directory: {os.getcwd()}")
+        print(f"Root directory contents: {list(root_dir.iterdir())}")
     
+    # Set Django settings module
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'BookMyBox.settings')
+    
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
