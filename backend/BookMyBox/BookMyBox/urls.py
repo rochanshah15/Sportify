@@ -21,6 +21,7 @@ from django.conf.urls.static import static
 from django.views.static import serve
 from . import api_views
 from . import frontend_views
+from . import asset_views
 import os
 
 # Custom error handlers
@@ -32,6 +33,12 @@ handler403 = 'BookMyBox.error_views.custom_403_view'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    
+    # Debug route for testing assets
+    path('debug-assets/', asset_views.debug_assets, name='debug_assets'),
+    
+    # Static files - MUST come before catch-all
+    re_path(r'^assets/(?P<path>.*)$', asset_views.serve_asset, name='serve_asset'),
     
     # API routes (must come before catch-all)
     path('api/user/', include('user.urls')),
@@ -46,20 +53,14 @@ urlpatterns = [
     # Chatbot endpoints
     path('', include('chatbot.urls')),
     
-    # Serve React app for non-asset routes (exclude /assets/)
-    re_path(r'^(?!assets/).*$', frontend_views.serve_react_app, name='react_app'),
+    # Serve React app for all other routes (catch-all - MUST BE LAST)
+    re_path(r'^.*$', frontend_views.serve_react_app, name='react_app'),
     
 ]
 
-# Add static file serving for both debug and production
+# Add media file serving
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# Ensure static files are served in production as well
+# Add static file serving for development
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-else:
-    # For production, explicitly serve static files
-    urlpatterns += [
-        re_path(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
-        re_path(r'^assets/(?P<path>.*)$', serve, {'document_root': os.path.join(settings.BASE_DIR, 'static', 'assets')}),
-    ]
