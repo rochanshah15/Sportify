@@ -226,6 +226,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:3000",  # Alternative React port
     "http://127.0.0.1:3000",
+    "https://sportify-8r9s.onrender.com",  # Production deployment
 ]
 
 # Add production frontend URL when available
@@ -233,8 +234,8 @@ FRONTEND_URL = os.getenv('FRONTEND_URL')
 if FRONTEND_URL:
     CORS_ALLOWED_ORIGINS.append(FRONTEND_URL)
 
-# For development, allow all origins (set to False in production)
-CORS_ALLOW_ALL_ORIGINS = DEBUG
+# For development and production, allow all origins for mobile compatibility
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     "accept",
