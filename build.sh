@@ -42,6 +42,10 @@ echo "Running Django management commands..."
 python manage.py collectstatic --noinput
 python manage.py migrate
 
+# Update box images with real URLs
+echo "Updating box images with real cricket/football ground URLs..."
+python manage.py update_box_images
+
 # Create superuser if it doesn't exist
 python manage.py shell -c "
 from django.contrib.auth import get_user_model
