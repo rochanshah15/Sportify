@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
-// Ensure this matches your Django backend's base URL
-const API_BASE_URL = 'http://localhost:8000/api'; 
+// Use environment variable for API base URL, fallback to localhost for development
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'; 
 
 export const api = axios.create({
   baseURL: API_BASE_URL,

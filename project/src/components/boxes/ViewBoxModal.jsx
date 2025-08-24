@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { X, MapPin, Users, Star, DollarSign, Clock, CheckCircle, XCircle, Calendar } from 'lucide-react';
+import { getMediaUrl } from '../../utils/apiConfig';
 
 const ViewBoxModal = ({ isOpen, onClose, box }) => {
   if (!isOpen || !box) return null;
@@ -54,7 +55,7 @@ const ViewBoxModal = ({ isOpen, onClose, box }) => {
           {box.image && (
             <div className="mb-6">
               <img 
-                src={box.image.startsWith('http') ? box.image : `http://localhost:8000${box.image}`}
+                src={getMediaUrl(box.image)}
                 alt={box.name}
                 className="w-full h-64 object-cover rounded-lg"
                 onError={(e) => {

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Bot, User, Loader2 } from 'lucide-react';
 import { EnhancedButton } from './EnhancedComponents';
+import { getApiUrl } from '../../utils/apiConfig';
 
 const Chatbot = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -55,7 +56,7 @@ const Chatbot = () => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:8000/api/chatbot', {
+            const response = await fetch(getApiUrl('/chatbot'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -92,7 +93,7 @@ const Chatbot = () => {
             let errorMessage = "I'm sorry, I'm having trouble connecting right now. ";
             
             if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-                errorMessage += "Please check if the backend server is running at http://localhost:8000 and try again.";
+                errorMessage += "Please check your internet connection and try again.";
             } else if (error.message.includes('HTTP 500')) {
                 errorMessage += "There's a server-side issue. Please try again in a moment.";
             } else if (error.message.includes('HTTP 400')) {

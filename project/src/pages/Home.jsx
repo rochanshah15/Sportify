@@ -241,8 +241,8 @@ const Home = () => {
               <EnhancedCard glass className="p-8 backdrop-blur-xl">
                 <div className="relative">
                   <img
-                    src="http://localhost:8000/media/box_images/pexels-grizzlybear-399187.jpg"
-                    alt="Sports Box"
+                    src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800&h=600&fit=crop&auto=format"
+                    alt="Beautiful Cricket Stadium"
                     className={`w-full h-64 object-cover rounded-2xl mb-6 ${shadows.medium}`}
                     onError={(e) => {
                       e.target.src = 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300&q=80'
